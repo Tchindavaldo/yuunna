@@ -1,0 +1,26 @@
+{
+  "env": {
+    "node": true,
+    "es2021": true,
+  },
+  "extends": ["eslint:recommended", "prettier"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true,
+    },
+  },
+  "rules": {
+    "brace-style": "off",
+    "curly": "off",
+    "indent": ["error", 2],
+    "linebreak-style": ["error", "unix"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "always"],
+    "no-unused-vars": ["warn"],
+    "object-curly-newline": "off",
+    "object-property-newline": "off",
+    "max-len": ["error", { "code": 120 }],
+  },
+}
