@@ -5,7 +5,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from '@/hooks/useColorScheme.web';
 
 export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,11 +13,7 @@ export function Collapsible({ children, title }: PropsWithChildren & { title: st
 
   return (
     <ThemedView>
-      <TouchableOpacity
-        style={styles.heading}
-        onPress={() => setIsOpen(value => !value)}
-        activeOpacity={0.8}
-      >
+      <TouchableOpacity style={styles.heading} onPress={() => setIsOpen(value => !value)} activeOpacity={0.8}>
         <IconSymbol
           name="chevron.right"
           size={18}
