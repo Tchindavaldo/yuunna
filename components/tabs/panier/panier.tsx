@@ -1,12 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+import Status from './status/status';
 
 export default function Cart() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Bonjour Panier</Text>
-    </View>
-  );
+  return <Status></Status>;
 }
 
 const styles = StyleSheet.create({

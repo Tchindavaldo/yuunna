@@ -31,19 +31,19 @@ export default function HomeComponent() {
 
   const renderItem = ({ item }: { item: string }) => (
     <View style={{ paddingLeft: 5 }}>
-      {/* Ligne horizontale pour ItemDesign1 */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
         {[...Array(2)].map((_, index) => (
           <ItemDesign1 key={`item1-${index}`} />
         ))}
       </ScrollView>
 
-      {/* Ligne horizontale pour ItemDesign2 */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
         {[...Array(3)].map((_, index) => (
           <ItemDesign2 key={`item2-${index}`} />
         ))}
       </ScrollView>
+
+      {/* <ItemDesign3 /> */}
     </View>
   );
 
