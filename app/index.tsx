@@ -1,6 +1,6 @@
-import { Redirect } from 'expo-router';
+import React from 'react';
+import { OnboardingScreen } from '../components/auth/login';
 
-export default function Index() {
-  // return <Redirect href={'/auth/login' as any} />;
-  return <Redirect href={'/home' as any} />;
+export default function LoginPage() {
+  return <OnboardingScreen />;
 }
