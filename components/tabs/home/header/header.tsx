@@ -7,7 +7,7 @@ export default function Header() {
   const insets = useSafeAreaInsets();
 
   return (
-    <>
+    <View>
       <View style={[styles.container, { paddingTop: insets.top }]}>
         {/* Chips côté gauche */}
         <View style={styles.chipsContainer}>
@@ -42,7 +42,7 @@ export default function Header() {
           </TouchableOpacity>
         ))}
       </ScrollView>
-    </>
+    </View>
   );
 }
 
@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingBottom: 25,
     backgroundColor: '#f9f9f9',
+    // height: 100,
   },
   categoryItem: {
     alignItems: 'center',

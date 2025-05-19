@@ -1,31 +1,38 @@
+import { ItemProps } from '@/interface/itemsProps';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ItemDesign2({ article = {} as any }) {
+export default function ItemDesign2({ article = {} as any, onPressItem }: ItemProps) {
   const {
     titre = 'Titre par défaut',
     disponibilite = 'indisponible',
     prix1 = '0 f',
-    image = require('../../../../assets/images/home/gm4.webp'), // image locale par défaut
+    image = require('../../../../../assets/images/home/gm4.webp'), // image locale par défaut
   } = article;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.imageCard}>
-        <Image source={image} style={styles.image} resizeMode="cover" />
-      </View>
+    <TouchableOpacity
+      activeOpacity={0.8}
+      onPress={() => {
+        onPressItem();
+      }}>
+      <View style={styles.container}>
+        <View style={styles.imageCard}>
+          <Image source={image} style={styles.image} resizeMode="cover" />
+        </View>
 
-      <Text style={styles.title}>{titre}</Text>
-      <Text style={styles.status}>{disponibilite}</Text>
+        <Text style={styles.title}>{titre}</Text>
+        <Text style={styles.status}>{disponibilite}</Text>
 
-      <View style={styles.row}>
-        <Text style={styles.price}>{prix1}</Text>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="options" size={12} color="white" />
-        </TouchableOpacity>
+        <View style={styles.row}>
+          <Text style={styles.price}>{prix1}</Text>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="options" size={12} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
