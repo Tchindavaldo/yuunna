@@ -1,132 +1,168 @@
-import React from 'react';
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Switch } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { ScrollView, StatusBar, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+import PageHeader from '../../common/PageHeader';
 
 export default function Account() {
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = React.useState(false);
 
   return (
-    <ScrollView style={styles.container}>
-      {/* En-tête du profil */}
-      <View style={styles.profileHeader}>
-        <Image 
-          source={{ uri: 'https://via.placeholder.com/100' }} 
-          style={styles.profileImage} 
-        />
-        <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>John Doe</Text>
-          <Text style={styles.profileEmail}>john.doe@example.com</Text>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Modifier le profil</Text>
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      {/* Header */}
+      <PageHeader
+        title="John Doe"
+        subtitle="john.doe@example.com"
+        iconName="person-outline"
+        badgeCount={0}
+        badgeColor="#3D5AFE"
+        onIconPress={() => console.log('Icône de profil pressée')}
+      />
+
+      <ScrollView style={styles.scrollContent}>
+        {/* Section des paramètres */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Paramètres</Text>
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="notifications-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Notifications</Text>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              trackColor={{ false: '#d3d3d3', true: '#4CAF50' }}
+            />
+          </View>
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="moon-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Mode sombre</Text>
+            </View>
+            <Switch
+              value={darkModeEnabled}
+              onValueChange={setDarkModeEnabled}
+              trackColor={{ false: '#d3d3d3', true: '#4CAF50' }}
+            />
+          </View>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="language-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Langue</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="color-palette-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Thème</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
           </TouchableOpacity>
         </View>
-      </View>
 
-      {/* Section des paramètres */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Paramètres</Text>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="notifications-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Notifications</Text>
-          </View>
-          <Switch
-            value={notificationsEnabled}
-            onValueChange={setNotificationsEnabled}
-            trackColor={{ false: '#d3d3d3', true: '#4CAF50' }}
-          />
+        {/* Section du compte */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Compte</Text>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="card-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Méthodes de paiement</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="location-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Adresses de livraison</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="shield-checkmark-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Confidentialité et sécurité</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="key-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Modifier le mot de passe</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
         </View>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="moon-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Mode sombre</Text>
-          </View>
-          <Switch
-            value={darkModeEnabled}
-            onValueChange={setDarkModeEnabled}
-            trackColor={{ false: '#d3d3d3', true: '#4CAF50' }}
-          />
+
+        {/* Section d'aide */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Aide</Text>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="help-circle-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Centre d'aide</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="information-circle-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>À propos</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="chatbubble-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Contacter le support</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Ionicons name="document-text-outline" size={24} color="#333" />
+              <Text style={styles.settingText}>Conditions d'utilisation</Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+          </TouchableOpacity>
         </View>
-        
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="language-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Langue</Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={24} color="#999" />
-        </TouchableOpacity>
-      </View>
 
-      {/* Section du compte */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Compte</Text>
-        
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="card-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Méthodes de paiement</Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={24} color="#999" />
+        {/* Bouton de déconnexion */}
+        <TouchableOpacity style={styles.logoutButton}>
+          <Ionicons name="log-out-outline" size={24} color="#fff" />
+          <Text style={styles.logoutText}>Déconnexion</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="location-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Adresses de livraison</Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={24} color="#999" />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="shield-checkmark-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Confidentialité et sécurité</Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={24} color="#999" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Section d'aide */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Aide</Text>
-        
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="help-circle-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>Centre d'aide</Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={24} color="#999" />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.settingItem}>
-          <View style={styles.settingLeft}>
-            <Ionicons name="information-circle-outline" size={24} color="#333" />
-            <Text style={styles.settingText}>À propos</Text>
-          </View>
-          <Ionicons name="chevron-forward-outline" size={24} color="#999" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Bouton de déconnexion */}
-      <TouchableOpacity style={styles.logoutButton}>
-        <Ionicons name="log-out-outline" size={24} color="#fff" />
-        <Text style={styles.logoutText}>Déconnexion</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
+  },
+  scrollContent: {
+    flex: 1,
+    backgroundColor: '#fff',
   },
   profileHeader: {
     flexDirection: 'row',
-    padding: 20,
+    padding: 0,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -165,10 +201,10 @@ const styles = StyleSheet.create({
   },
   section: {
     backgroundColor: '#fff',
-    marginTop: 20,
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
+    marginTop: 0,
+    paddingBottom: 10,
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
     borderColor: '#e0e0e0',
   },
   sectionTitle: {
@@ -176,15 +212,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 25,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: 19,
     paddingHorizontal: 20,
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
   settingLeft: {

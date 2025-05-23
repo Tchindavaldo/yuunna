@@ -1,4 +1,5 @@
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import PageHeader from '../../../common/PageHeader';
 import React from 'react';
 import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -105,20 +106,14 @@ export default function SuiviColis() {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Notifications</Text>
-          <View style={styles.headerSubtitle}>
-            <Text style={styles.headerSubtitleText}>Restez informé de toutes vos activités</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Ionicons name="notifications-outline" size={22} color="#333" />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationBadgeText}>{notifications.filter(n => !n.read).length}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <PageHeader
+        title="Suivi de Colis"
+        subtitle="Suivez vos livraisons en temps réel"
+        iconName="cube-outline"
+        badgeCount={notifications.filter(n => n.icon === 'cube-outline').length}
+        badgeColor="#4CAF50"
+        onIconPress={() => console.log('Icône de colis pressée')}
+      />
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Analytics Section */}

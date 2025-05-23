@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import PageHeader from '../../common/PageHeader';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
@@ -208,20 +209,14 @@ function NotificationSimple() {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Notifications</Text>
-          <View style={styles.headerSubtitle}>
-            <Text style={styles.headerSubtitleText}>Restez informé de toutes vos activités</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Ionicons name="notifications-outline" size={22} color="#333" />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationBadgeText}>{notifications.filter(n => !n.read).length}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <PageHeader
+        title="Notifications"
+        subtitle="Restez informé de toutes vos activités"
+        iconName="notifications-outline"
+        badgeCount={notifications.filter(n => !n.read).length}
+        badgeColor="#FF6B6B"
+        onIconPress={() => console.log('Icône de notification pressée')}
+      />
 
       {/* Liste des notifications */}
       {notifications.length > 0 ? (

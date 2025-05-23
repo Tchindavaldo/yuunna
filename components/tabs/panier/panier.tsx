@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import PageHeader from '../../common/PageHeader';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Animated, Dimensions, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -128,20 +129,14 @@ export default function Cart() {
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Mon Panier</Text>
-          <View style={styles.headerSubtitle}>
-            <Text style={styles.headerSubtitleText}>Gérez vos articles et commandes</Text>
-          </View>
-        </View>
-        <TouchableOpacity style={styles.settingsButton}>
-          <Ionicons name="cart-outline" size={22} color="#333" />
-          <View style={styles.notificationBadge}>
-            <Text style={styles.notificationBadgeText}>{cartItems.length}</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      <PageHeader
+        title="Mon Panier"
+        subtitle="Gérez vos articles et commandes"
+        iconName="cart-outline"
+        badgeCount={cartItems.length}
+        badgeColor="red"
+        onIconPress={() => console.log('Icône de panier pressée')}
+      />
 
       {cartItems.length > 0 ? (
         <>
