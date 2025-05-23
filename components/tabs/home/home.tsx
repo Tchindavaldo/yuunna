@@ -231,7 +231,7 @@ export default function HomeComponent() {
   }, []);
 
   const renderItem = ({ item }: { item: any }) => (
-    <View style={styles.itemContainer}>
+    <View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
         {[...Array(2)].map((_, index) => (
           <ItemDesign1
