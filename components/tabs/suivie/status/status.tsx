@@ -1,11 +1,124 @@
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function SuiviColis() {
+  const notifications = [
+    {
+      id: '1',
+      title: 'Nouvelle promotion',
+      message:
+        "Profitez de 20% de réduction sur votre prochaine commande avec le code PROMO20. Offre valable jusqu'au 30 juin.",
+      time: 'Il y a 2h',
+      read: false,
+      icon: 'pricetag-outline',
+      color: '#FF6B6B',
+    },
+    {
+      id: '2',
+      title: 'Commande expédiée',
+      message: 'Votre commande #YU78542 a été expédiée et sera livrée dans 2-3 jours ouvrables.',
+      time: 'Il y a 5h',
+      read: false,
+      icon: 'cube-outline',
+      color: '#4CAF50',
+    },
+    {
+      id: '3',
+      title: 'Paiement confirmé',
+      message: 'Le paiement de 89,99€ pour votre commande #YU78542 a été confirmé. Merci pour votre achat!',
+      time: 'Hier',
+      read: true,
+      icon: 'card-outline',
+      color: '#3D5AFE',
+    },
+    {
+      id: '4',
+      title: 'Nouveau produit disponible',
+      message: 'Découvrez notre nouvelle collection été 2025 maintenant disponible sur notre boutique.',
+      time: 'Il y a 2j',
+      read: true,
+      icon: 'star-outline',
+      color: '#FF9800',
+    },
+    {
+      id: '5',
+      title: 'Avis client',
+      message:
+        "Merci d'avoir effectué un achat chez Yuunna. Pourriez-vous prendre un moment pour évaluer votre expérience?",
+      time: 'Il y a 3j',
+      read: true,
+      icon: 'chatbubble-outline',
+      color: '#607D8B',
+    },
+    {
+      id: '6',
+      title: "Mise à jour de l'application",
+      message:
+        "Une nouvelle version de l'application est disponible. Mettez à jour pour profiter des dernières fonctionnalités.",
+      time: 'Il y a 4j',
+      read: true,
+      icon: 'refresh-outline',
+      color: '#00BCD4',
+    },
+    {
+      id: '7',
+      title: 'Invitation à un événement',
+      message: 'Vous êtes invité à notre événement exclusif de lancement de produit le 15 juillet à Paris.',
+      time: 'Il y a 5j',
+      read: true,
+      icon: 'calendar-outline',
+      color: '#9C27B0',
+    },
+    {
+      id: '8',
+      title: 'Rappel: Articles dans votre panier',
+      message: "Vous avez des articles dans votre panier. Complétez votre achat avant qu'ils ne soient épuisés!",
+      time: 'Il y a 6j',
+      read: true,
+      icon: 'cart-outline',
+      color: '#E91E63',
+    },
+    {
+      id: '9',
+      title: 'Programme de fidélité',
+      message:
+        'Félicitations! Vous avez atteint le niveau Silver dans notre programme de fidélité. Profitez de nouveaux avantages exclusifs.',
+      time: 'Il y a 1sem',
+      read: true,
+      icon: 'ribbon-outline',
+      color: '#8BC34A',
+    },
+    {
+      id: '10',
+      title: 'Maintenance planifiée',
+      message:
+        'Notre application sera en maintenance le 25 juin de 2h à 4h du matin. Nous nous excusons pour la gêne occasionnée.',
+      time: 'Il y a 2sem',
+      read: true,
+      icon: 'construct-outline',
+      color: '#FFC107',
+    },
+  ];
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+    <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <View style={styles.headerContent}>
+          <Text style={styles.headerTitle}>Notifications</Text>
+          <View style={styles.headerSubtitle}>
+            <Text style={styles.headerSubtitleText}>Restez informé de toutes vos activités</Text>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.settingsButton}>
+          <Ionicons name="notifications-outline" size={22} color="#333" />
+          <View style={styles.notificationBadge}>
+            <Text style={styles.notificationBadgeText}>{notifications.filter(n => !n.read).length}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Analytics Section */}
@@ -273,7 +386,7 @@ export default function SuiviColis() {
           </ScrollView>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -291,6 +404,61 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     padding: 16,
     paddingBottom: 10,
+  },
+
+  header: {
+    backgroundColor: '#fff',
+    paddingTop: 50,
+    paddingBottom: 15,
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    height: 120,
+  },
+  headerContent: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 5,
+  },
+  headerSubtitle: {
+    opacity: 1,
+  },
+  headerSubtitleText: {
+    fontSize: 14,
+    color: '#888',
+  },
+
+  notificationBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: 'red',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  settingsButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notificationBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
   sectionHeader: {
     flexDirection: 'row',
