@@ -8,8 +8,8 @@ const Routes = {
       detail: '(route)/(tabsChild)/home/detail',
     },
 
-    categories: {
-      index: '(route)/(tabs)/categories/index',
+    suivie: {
+      index: '(route)/(tabs)/suivie/index',
     },
 
     cart: {

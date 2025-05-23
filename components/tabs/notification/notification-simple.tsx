@@ -24,7 +24,7 @@ type NotificationItem = {
   message: string;
   time: string;
   read: boolean;
-  icon: any; // On utilise 'any' pour éviter les problèmes de typage avec les icônes
+  icon: keyof typeof Ionicons.glyphMap;
   color: string;
 };
 

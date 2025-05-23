@@ -20,7 +20,7 @@ export default function BottomNav() {
             case 'home':
               iconName = focused ? 'home' : 'home-outline';
               break;
-            case 'categories':
+            case 'suivie':
               iconName = focused ? 'grid' : 'grid-outline';
               break;
             case 'cart':
@@ -37,7 +37,7 @@ export default function BottomNav() {
         },
       })}>
       <Tabs.Screen name="home" options={{ title: 'Accueil' }} />
-      <Tabs.Screen name="categories" options={{ title: 'Catégories' }} />
+      <Tabs.Screen name="suivie" options={{ title: 'suivie' }} />
       <Tabs.Screen name="cart" options={{ title: 'Panier' }} />
       <Tabs.Screen name="account" options={{ title: 'Compte' }} />
     </Tabs>

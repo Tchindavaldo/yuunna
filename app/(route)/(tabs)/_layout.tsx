@@ -16,7 +16,7 @@ export default function TabLayout() {
         tabBarIcon: ({ focused, color }) => {
           const tabIconMap: Record<string, [string, string]> = {
             'home/index': ['home-outline', 'home'],
-            'categories/index': ['grid-outline', 'grid'],
+            'suivie/index': ['grid-outline', 'grid'],
             'cart/index': ['cart-outline', 'cart'],
             'account/index': ['person-outline', 'person'],
             'notification/index': ['notifications-outline', 'notifications'],
@@ -29,8 +29,8 @@ export default function TabLayout() {
         },
       })}>
       <Tabs.Screen name="home/index" options={{ title: 'Accueil' }} />
-      <Tabs.Screen name="categories/index" options={{ title: 'Catégories' }} />
       <Tabs.Screen name="cart/index" options={{ title: 'Panier' }} />
+      <Tabs.Screen name="suivie/index" options={{ title: 'Suivie' }} />
       <Tabs.Screen name="notification/index" options={{ title: 'Notifications' }} />
       <Tabs.Screen name="account/index" options={{ title: 'Compte' }} />
     </Tabs>
