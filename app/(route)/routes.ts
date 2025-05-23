@@ -25,6 +25,10 @@ const Routes = {
     },
   },
 
+  payment: {
+    index: 'payment/index',
+  },
+
   other: {
     notFound: 'other/+not-found',
   },

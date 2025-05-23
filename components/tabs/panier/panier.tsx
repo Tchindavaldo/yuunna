@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import PageHeader from '../../common/PageHeader';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Animated, Dimensions, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import PageHeader from '../../common/PageHeader';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Cart() {
+  const router = useRouter();
   // Animation pour le défilement
   const scrollY = new Animated.Value(0);
   const headerHeight = scrollY.interpolate({
@@ -164,7 +166,10 @@ export default function Cart() {
               <Text style={styles.totalValue}>€{total.toFixed(2)}</Text>
             </View>
 
-            <TouchableOpacity style={styles.checkoutButton}>
+            <TouchableOpacity 
+              style={styles.checkoutButton}
+              onPress={() => router.push({ pathname: '/payment', params: { totalAmount: total } })}
+            >
               <LinearGradient
                 colors={['#4CAF50', '#2E7D32']}
                 start={{ x: 0, y: 0 }}
