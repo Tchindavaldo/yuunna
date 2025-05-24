@@ -17,6 +17,9 @@ import ItemDesign1 from './design/design1/item-design-1';
 import ItemDesign2 from './design/design2/item-design-2';
 import Header from './header/header';
 import { useNavigateWithData } from './utils/navigate';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { fetchProducts, resetProducts } from '../../../store/productSlice';
+import { Product } from '../../../store/types';
 
 const PAGE_SIZE = 10;
 
@@ -147,10 +150,8 @@ const styles = StyleSheet.create({
 
 export default function HomeComponent() {
   const navigateWithData = useNavigateWithData();
-
-  const [data, setData] = useState<object[]>([]);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { items: data, loading, page, hasMore } = useAppSelector((state) => state.products);
   const [loaderType, setLoaderType] = useState<'default' | 'pulse' | 'dots' | 'progress' | 'skeleton'>('pulse');
 
   // Animations
@@ -178,10 +179,10 @@ export default function HomeComponent() {
         ])
       ).start();
 
-      // Animation de la barre de progression
+      // Animation de progression
       Animated.timing(progressAnim, {
         toValue: 1,
-        duration: 2000,
+        duration: 5000, // 5 secondes pour compléter la barre
         easing: Easing.linear,
         useNativeDriver: false,
       }).start();
@@ -190,73 +191,59 @@ export default function HomeComponent() {
       Animated.loop(
         Animated.timing(dotsAnim, {
           toValue: 1,
-          duration: 1000,
+          duration: 1500,
           easing: Easing.linear,
-          useNativeDriver: true,
+          useNativeDriver: false,
         })
       ).start();
     }
-  }, [loading]);
-
-  const fetchData = async () => {
-    if (loading) return;
-    setLoading(true);
-
-    // Simuler une API (tu peux remplacer ça par fetch/axios)
-    const newItems = Array.from({ length: PAGE_SIZE }, (_, i) => ({
-      id: `${i + 1 + (page - 1) * PAGE_SIZE}`,
-      title: 'Article ' + PAGE_SIZE,
-      price: PAGE_SIZE + '.99€',
-      category: 'Électronique' + PAGE_SIZE,
-      rating: 4.5,
-      stock: 1 + PAGE_SIZE,
-    }));
-
-    // Délai simulé - 5 secondes pour le premier chargement, 1 seconde pour les suivants
-    if (data.length === 0) {
-      // Premier chargement - attendre 5 secondes
-      await new Promise(r => setTimeout(r, 5000));
-    } else {
-      // Chargements suivants - attendre 1 seconde
-      await new Promise(r => setTimeout(r, 20000));
-    }
-
-    setData(prev => [...prev, ...newItems]);
-    setPage(prev => prev + 1);
-    setLoading(false);
-  };
+  }, [loading, pulseAnim, progressAnim, dotsAnim]);
 
   useEffect(() => {
+    // Charger les données initiales
     fetchData();
+    
+    // Nettoyer les données lors du démontage du composant
+    return () => {
+      dispatch(resetProducts());
+    };
   }, []);
 
-  const renderItem = ({ item }: { item: any }) => (
-    <View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
-        {[...Array(2)].map((_, index) => (
-          <ItemDesign1
-            onPressItem={() => {
-              navigateWithData(Routes.tabs.home.detail, item);
-            }}
-            key={`${item.id}${index}`}
-          />
-        ))}
-      </ScrollView>
+  const fetchData = async () => {
+    if (loading || !hasMore) return;
+    
+    try {
+      // Utiliser le thunk pour récupérer les produits
+      await dispatch(fetchProducts({ page, limit: PAGE_SIZE }));
+    } catch (error) {
+      console.error('Erreur lors du chargement des produits:', error);
+    }
+  };
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 20 }}>
-        {[...Array(3)].map((_, index) => (
-          <ItemDesign2
-            onPressItem={() => {
-              navigateWithData(Routes.tabs.home.detail, item);
-            }}
-            key={`item2${item.id}${index}`}
-          />
-        ))}
-      </ScrollView>
+  const renderItem = ({ item }: { item: Product }) => {
+    // Adapter le format du produit pour correspondre à l'interface ItemProps
+    const article = {
+      titre: item.titre,
+      disponibilite: item.status === 'active' ? 'disponible' : 'indisponible',
+      prix1: item.prix,
+      // Utiliser l'imageUrl pour afficher l'image du produit
+      image: item.imageUrl ? { uri: item.imageUrl } : undefined
+    };
+    
+    // Fonction onPress pour la navigation
+    const onPressItem = () => {
+      navigateWithData(Routes.tabs.home.detail, { product: item });
+    };
 
-      {/* <ItemDesign3 /> */}
-    </View>
-  );
+    // Alterner entre les deux designs pour la démonstration
+    const isEvenId = parseInt(item.id, 10) % 2 === 0;
+
+    if (isEvenId) {
+      return <ItemDesign1 article={article} onPressItem={onPressItem} />;
+    } else {
+      return <ItemDesign2 article={article} onPressItem={onPressItem} />;
+    }
+  };
 
   const renderLoader = () => {
     // Si c'est le chargement initial (pas de données)
