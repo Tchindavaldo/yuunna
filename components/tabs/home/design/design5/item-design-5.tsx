@@ -3,8 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { memo } from 'react';
 import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-// Style Pinterest avec un élément principal et deux éléments secondaires
-function ItemDesign4({
+// Style Pinterest inversé avec les éléments secondaires à gauche et l'élément principal à droite
+function ItemDesign5({
   article = {} as any,
   onPressItem,
   secondItem = {},
@@ -47,8 +47,8 @@ function ItemDesign4({
 
   return (
     <View style={styles.pinterestContainer}>
-      {/* Conteneur pour les deux éléments de gauche */}
-      <View style={styles.sideContainer}>
+      {/* Conteneur pour les deux éléments de gauche - INVERSÉ PAR RAPPORT À DESIGN 4 */}
+      <View style={styles.leftContainer}>
         {/* Élément secondaire en haut à gauche - Design créatif */}
         <TouchableOpacity activeOpacity={0.8} onPress={() => {}} style={styles.secondaryItem}>
           <View style={styles.secondaryImageContainer}>
@@ -57,18 +57,18 @@ function ItemDesign4({
               style={styles.image}
               resizeMode="cover"
             />
-            {/* Overlay coloré au lieu d'un dégradé noir */}
+            {/* Overlay coloré avec dégradé violet */}
             <View style={styles.colorOverlay1} />
 
-            {/* Badge de prix flottant */}
-            <View style={styles.floatingPriceBadge}>
-              <Text style={styles.floatingPrice}>{prix2}</Text>
+            {/* Badge de prix avec design hexagonal */}
+            <View style={styles.hexagonPriceBadge}>
+              <Text style={styles.hexagonPrice}>{prix2}</Text>
             </View>
 
             {/* Badge de ventes avec design amélioré */}
             {ventes2 && (
               <View style={styles.enhancedSalesBadge}>
-                <Ionicons name="flame" size={10} color="#FFF" />
+                <Ionicons name="trending-up" size={10} color="#FFF" />
                 <Text style={styles.enhancedSalesText}>{ventes2}</Text>
               </View>
             )}
@@ -94,18 +94,18 @@ function ItemDesign4({
               style={styles.image}
               resizeMode="cover"
             />
-            {/* Overlay coloré différent */}
+            {/* Overlay coloré avec dégradé turquoise */}
             <View style={styles.colorOverlay2} />
 
-            {/* Badge de prix avec style différent */}
-            <View style={styles.ribbonPriceBadge}>
-              <Text style={styles.ribbonPrice}>{prix3}</Text>
+            {/* Badge de prix avec style circulaire */}
+            <View style={styles.circlePriceBadge}>
+              <Text style={styles.circlePrice}>{prix3}</Text>
             </View>
 
             {/* Badge de ventes avec position différente */}
             {ventes3 && (
               <View style={styles.cornerSalesBadge}>
-                <Ionicons name="star" size={10} color="#FFF" />
+                <Ionicons name="rocket" size={10} color="#FFF" />
                 <Text style={styles.cornerSalesText}>{ventes3}</Text>
               </View>
             )}
@@ -118,17 +118,17 @@ function ItemDesign4({
             </Text>
             <View style={styles.tagContainer}>
               <View style={styles.productTag}>
-                <Text style={styles.tagText}>Nouveau</Text>
+                <Text style={styles.tagText}>Exclusif</Text>
               </View>
               <View style={styles.productTag2}>
-                <Text style={styles.tagText}>Top</Text>
+                <Text style={styles.tagText}>Promo</Text>
               </View>
             </View>
           </View>
         </TouchableOpacity>
       </View>
 
-      {/* Élément principal à droite */}
+      {/* Élément principal à droite - INVERSÉ PAR RAPPORT À DESIGN 4 */}
       <TouchableOpacity activeOpacity={0.8} onPress={() => onPressItem()} style={styles.mainItem}>
         {/* Image principale avec overlay de dégradé */}
         <View style={styles.mainImageContainer}>
@@ -138,8 +138,8 @@ function ItemDesign4({
             resizeMode="cover"
           />
 
-          {/* Dégradé en bas de l'image */}
-          <View style={styles.gradient} />
+          {/* Overlay coloré subtil */}
+          <View style={styles.mainOverlay} />
 
           {/* Badge de ventes */}
           {ventes && (
@@ -153,6 +153,11 @@ function ItemDesign4({
           <TouchableOpacity style={styles.favoriteButton}>
             <Ionicons name="heart-outline" size={18} color="#FFFFFF" />
           </TouchableOpacity>
+
+          {/* Badge de prix premium */}
+          <View style={styles.premiumPriceBadge}>
+            <Text style={styles.premiumPrice}>{prix1}</Text>
+          </View>
         </View>
 
         {/* Informations du produit */}
@@ -162,7 +167,6 @@ function ItemDesign4({
           </Text>
 
           <View style={styles.priceRow}>
-            <Text style={styles.price}>{prix1}</Text>
             {!isAvailable && (
               <View style={styles.unavailableBadge}>
                 <Text style={styles.unavailableText}>Indisponible</Text>
@@ -187,10 +191,9 @@ function ItemDesign4({
 }
 
 const { width } = Dimensions.get('window');
-const itemWidth = (width - 40) / 2; // 2 colonnes avec marge
 
 const styles = StyleSheet.create({
-  // Conteneur principal de la disposition Pinterest
+  // Conteneur principal de la disposition Pinterest inversée
   pinterestContainer: {
     width: width - 16,
     height: 350,
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
-  // Élément principal maintenant à droite
+  // Élément principal à droite (inversé)
   mainItem: {
     width: '58%',
     height: '100%',
@@ -213,14 +216,14 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 
-  // Conteneur pour les deux éléments maintenant à gauche
-  sideContainer: {
+  // Conteneur pour les deux éléments de gauche (inversé)
+  leftContainer: {
     width: '40%',
     height: '100%',
     justifyContent: 'space-between',
   },
 
-  // Éléments secondaires à droite
+  // Éléments secondaires à gauche
   secondaryItem: {
     height: '48%',
     borderRadius: 12,
@@ -254,7 +257,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(76, 175, 80, 0.15)', // Vert transparent
+    backgroundColor: 'rgba(156, 39, 176, 0.15)', // Violet transparent
     borderRadius: 12,
   },
 
@@ -264,19 +267,30 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(33, 150, 243, 0.15)', // Bleu transparent
+    backgroundColor: 'rgba(0, 188, 212, 0.15)', // Turquoise transparent
     borderRadius: 12,
   },
 
-  // Styles pour les badges de prix flottants
-  floatingPriceBadge: {
+  mainOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(233, 30, 99, 0.05)', // Rose très transparent
+    borderRadius: 12,
+  },
+
+  // Styles pour les badges de prix hexagonaux
+  hexagonPriceBadge: {
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: '#4CAF50',
-    borderRadius: 15,
+    backgroundColor: '#9C27B0',
+    borderRadius: 5,
     paddingHorizontal: 8,
     paddingVertical: 4,
+    transform: [{ rotate: '0deg' }],
     elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -284,10 +298,56 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
   },
 
-  floatingPrice: {
+  hexagonPrice: {
     color: '#FFF',
     fontWeight: '700',
     fontSize: 12,
+  },
+
+  // Styles pour les badges de prix circulaires
+  circlePriceBadge: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: '#00BCD4',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+
+  circlePrice: {
+    color: '#FFF',
+    fontWeight: '700',
+    fontSize: 11,
+  },
+
+  // Style pour le badge de prix premium
+  premiumPriceBadge: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    backgroundColor: '#E91E63',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+  },
+
+  premiumPrice: {
+    color: '#FFF',
+    fontWeight: '800',
+    fontSize: 14,
   },
 
   // Styles pour les badges de ventes améliorés
@@ -295,7 +355,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 10,
     left: 10,
-    backgroundColor: '#FF5722',
+    backgroundColor: '#673AB7',
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -313,9 +373,9 @@ const styles = StyleSheet.create({
   // Styles pour les badges de ventes en coin
   cornerSalesBadge: {
     position: 'absolute',
-    top: 10,
+    bottom: 10,
     left: 10,
-    backgroundColor: '#9C27B0',
+    backgroundColor: '#00BCD4',
     borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -328,23 +388,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '600',
     marginLeft: 3,
-  },
-
-  // Styles pour les badges de prix en ruban
-  ribbonPriceBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderTopLeftRadius: 12,
-  },
-
-  ribbonPrice: {
-    color: '#FFF',
-    fontWeight: '700',
-    fontSize: 12,
   },
 
   // Styles pour les conteneurs d'informations améliorés
@@ -371,7 +414,7 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#9C27B0',
     marginRight: 4,
   },
 
@@ -387,7 +430,7 @@ const styles = StyleSheet.create({
   },
 
   productTag: {
-    backgroundColor: '#FF9800',
+    backgroundColor: '#00BCD4',
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -407,179 +450,125 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // Anciens styles maintenus pour compatibilité
-  smallSalesBadge: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-    borderRadius: 10,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  smallSalesText: {
-    fontSize: 9,
-    color: '#333',
-    marginLeft: 2,
-  },
-
-  smallInfoContainer: {
-    padding: 8,
-    justifyContent: 'space-between',
-    height: '40%',
-  },
-
-  smallTitle: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#333',
-  },
-
-  smallPrice: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FF4500',
-  },
-
-  // Ancien style container maintenu pour compatibilité
-  container: {
-    width: width / 2 + 17,
-    height: 250,
-    borderRadius: 12,
-    backgroundColor: '#FFFFFF',
-    marginBottom: 16,
-    marginHorizontal: 8,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-
-  imageContainer: {
-    width: '100%',
-    height: 150,
-    position: 'relative',
-  },
+  // Styles pour l'image
   image: {
     width: '100%',
     height: '100%',
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
+
+  // Styles pour le gradient
   gradient: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     height: 50,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
+
+  // Styles pour les badges de ventes
   salesBadge: {
     position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    bottom: 10,
+    left: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
   },
+
   salesText: {
     fontSize: 10,
     color: '#333',
     marginLeft: 3,
     fontWeight: '500',
   },
+
+  // Styles pour le bouton favori
   favoriteButton: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    top: 10,
+    left: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  // Styles pour les informations du produit
   infoContainer: {
-    padding: 8,
-    flex: 1,
+    padding: 10,
+    height: '35%',
     justifyContent: 'space-between',
   },
+
   title: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 6,
-    letterSpacing: 0.2,
   },
+
   priceRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginVertical: 4,
+    alignItems: 'center',
   },
+
   price: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#FF4500',
-    letterSpacing: 0.5,
+    color: '#E91E63',
   },
+
+  // Styles pour le badge d'indisponibilité
   unavailableBadge: {
-    backgroundColor: '#F0F0F0',
+    backgroundColor: '#F44336',
+    borderRadius: 4,
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 4,
   },
+
   unavailableText: {
-    fontSize: 8,
-    color: '#999',
-  },
-  shopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  shopBadge: {
-    backgroundColor: '#F5F5F5',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-    flex: 1,
-    marginRight: 6,
-  },
-  shopText: {
-    fontSize: 9,
-    color: '#666',
+    color: '#FFF',
+    fontSize: 10,
     fontWeight: '500',
   },
+
+  // Styles pour la rangée du vendeur
+  shopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  shopBadge: {
+    backgroundColor: 'rgba(233, 30, 99, 0.1)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+
+  shopText: {
+    color: '#E91E63',
+    fontSize: 10,
+    fontWeight: '500',
+  },
+
+  // Style pour le bouton du panier
   cartButton: {
-    backgroundColor: '#4CAF50',
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    backgroundColor: '#E91E63',
+    borderRadius: 15,
+    width: 30,
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
   },
 });
 
-// Exporter le composant mémoisé pour éviter les rendus inutiles
-export default memo(ItemDesign4);
+export default memo(ItemDesign5);

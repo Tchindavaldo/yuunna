@@ -167,10 +167,13 @@ export const productService = {
 
     // Images pour la simulation
     const images = [
-      'https://g-search1.alicdn.com/img/bao/uploaded/i4/i1/805794591/O1CN01gl1dz91jmiwL4dZvt_!!805794591.jpg_580x580q90.jpg',
-      'https://g-search1.alicdn.com/img/bao/uploaded/i4/i3/2200724907121/O1CN01gCMSGD1CTBo1xbDjQ_!!0-item_pic.jpg_580x580q90.jpg',
-      'https://g-search1.alicdn.com/img/bao/uploaded/i4/i4/2208876287052/O1CN01Xt9vI41xFPcBM0ZWI_!!0-item_pic.jpg_580x580q90.jpg',
-      'https://g-search1.alicdn.com/img/bao/uploaded/i4/i3/2212330857676/O1CN01qNWGpS1FCg8sBUCeF_!!0-item_pic.jpg_580x580q90.jpg',
+      'https://g-search3.alicdn.com/img/bao/uploaded/i4/i4/2639246106/O1CN01cOeB291uyb9UVRT8S_!!2639246106.jpg_580x580q90.jpg',
+
+      'https://g-search3.alicdn.com/img/bao/uploaded/i4/i1/2213776641680/O1CN01VL4UJw1OHUROsEj1x_!!2213776641680.jpg_580x580q90.jpg',
+
+      'https://g-search2.alicdn.com/img/bao/uploaded/i4/i1/2032126449/O1CN01WecMfq1xVhGj4MtfO_!!4611686018427382257-0-item_pic.jpg_580x580q90.jpg_.webp',
+
+      'https://g-search3.alicdn.com/img/bao/uploaded/i4/i2/2218159811393/O1CN01VF6NMF1MA2lcoTlen_!!4611686018427382593-0-item_pic.jpg_460x460q90.jpg_.webp',
     ];
 
     // Calculer l'index de départ pour la pagination

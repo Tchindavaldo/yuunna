@@ -16,10 +16,11 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { fetchProducts } from '../../../store/productSlice';
 import { Product } from '../../../store/types';
 import BottomNav from '../../gloabal/bottom-nav';
-import ItemDesign1 from './design/design1/item-design-1';
 import ItemDesign2 from './design/design2/item-design-2';
 import ItemDesign3 from './design/design3/item-design-3';
 import ItemDesign4 from './design/design4/item-design-4';
+import ItemDesign5 from './design/design5/item-design-5';
+import ItemDesign6 from './design/design6/item-design-6';
 import Header from './header/header';
 import { useNavigateWithData } from './utils/navigate';
 
@@ -43,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   sectionHeader: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 0,
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
@@ -51,18 +52,19 @@ const styles = StyleSheet.create({
   // Styles pour Pinterest/Taobao
   pinterestOuterContainer: {
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 0,
     backgroundColor: '#f9f9f9',
     borderRadius: 12,
-    padding: 10,
+    padding: 0,
   },
   pinterestTitle: {
-    fontSize: 16,
+    fontSize: 0,
     fontWeight: '600',
     color: '#333',
     marginBottom: 10,
-    marginLeft: 8,
+    marginLeft: 0,
   },
+
   pinterestDirectContainer: {
     position: 'relative',
     width: '100%',
@@ -110,7 +112,7 @@ const styles = StyleSheet.create({
   pinterestSingleContainer: {
     width: '100%',
     alignItems: 'flex-start',
-    paddingHorizontal: 4,
+    paddingHorizontal: 0,
   },
   pinterestRow: {
     flexDirection: 'row',
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   pinterestHeader: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 0,
     paddingVertical: 10,
     marginTop: 10,
   },
@@ -459,40 +461,6 @@ export default function HomeComponent() {
 
       return (
         <View>
-          {/* Section 1: Design 1 - Horizontal */}
-          <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Produits populaires</Text>
-            </View>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 20, paddingHorizontal: 15 }}
-              removeClippedSubviews={true}>
-              {/* Afficher le produit principal */}
-              <ItemDesign1 article={article} onPressItem={createOnPressItem(item)} key={`${item.id}_main`} />
-
-              {/* Afficher les produits suivants */}
-              {design1Products.map((product, idx) => {
-                const productArticle = {
-                  titre: product.titre,
-                  disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
-                  prix1: product.prix,
-                  image: product.imageUrl ? { uri: product.imageUrl } : undefined,
-                  vendeur: product.vendeur,
-                  ventes: product.ventes,
-                };
-                return (
-                  <ItemDesign1
-                    article={productArticle}
-                    onPressItem={createOnPressItem(product)}
-                    key={`${product.id}_design1_${idx}`}
-                  />
-                );
-              })}
-            </ScrollView>
-          </View>
-
           {/* Section 2: Design 2 - Horizontal */}
           <View style={styles.sectionContainer}>
             <View style={styles.sectionHeader}>
@@ -501,7 +469,7 @@ export default function HomeComponent() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 15, paddingHorizontal: 15 }}
+              contentContainerStyle={{ gap: 15, paddingHorizontal: 0 }}
               removeClippedSubviews={true}>
               {design2Products.map((product, idx) => {
                 const productArticle = {
@@ -532,7 +500,7 @@ export default function HomeComponent() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{ gap: 15, paddingHorizontal: 15 }}
+              contentContainerStyle={{ gap: 15, paddingHorizontal: 0 }}
               removeClippedSubviews={true}>
               {/* Produits premium */}
               {data
@@ -585,7 +553,7 @@ export default function HomeComponent() {
             <View style={styles.pinterestOuterContainer}>
               <Text style={styles.pinterestTitle}>Style Pinterest/Taobao</Text>
 
-              {/* Affichage d'un seul élément ItemDesign4 */}
+              {/* Affichage du composant ItemDesign4 avec 3 éléments */}
               <View style={styles.pinterestSingleContainer}>
                 {design4Products.length > 0 && (
                   <ItemDesign4
@@ -598,8 +566,111 @@ export default function HomeComponent() {
                       ventes: `${Math.floor(Math.random() * 200) + 10} ventes`,
                     }}
                     onPressItem={createOnPressItem(design4Products[0])}
+                    secondItem={
+                      design4Products.length > 1
+                        ? {
+                            titre: design4Products[1].titre,
+                            disponibilite: design4Products[1].status === 'active' ? 'disponible' : 'indisponible',
+                            prix1: design4Products[1].prix,
+                            image: design4Products[1].imageUrl ? { uri: design4Products[1].imageUrl } : undefined,
+                            vendeur: design4Products[1].vendeur || 'Boutique Accessoires',
+                            ventes: `${Math.floor(Math.random() * 150) + 10} ventes`,
+                          }
+                        : undefined
+                    }
+                    thirdItem={
+                      design4Products.length > 2
+                        ? {
+                            titre: design4Products[2].titre,
+                            disponibilite: design4Products[2].status === 'active' ? 'disponible' : 'indisponible',
+                            prix1: design4Products[2].prix,
+                            image: design4Products[2].imageUrl ? { uri: design4Products[2].imageUrl } : undefined,
+                            vendeur: design4Products[2].vendeur || 'Boutique Collections',
+                            ventes: `${Math.floor(Math.random() * 120) + 10} ventes`,
+                          }
+                        : undefined
+                    }
                   />
                 )}
+              </View>
+            </View>
+          </View>
+
+          {/* Section 5: Design 5 - Pinterest/Taobao Inversé */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Collection Exclusive</Text>
+              <Text style={styles.sectionSubtitle}>Sélection spéciale</Text>
+            </View>
+
+            <View style={styles.pinterestOuterContainer}>
+              {/* <Text style={styles.pinterestTitle}>Style Pinterest Inversé</Text> */}
+
+              {/* Affichage du composant ItemDesign5 avec 3 éléments - disposition inversée */}
+              <View style={styles.pinterestSingleContainer}>
+                {design4Products.length > 0 && (
+                  <ItemDesign5
+                    article={{
+                      titre: design4Products[0].titre,
+                      disponibilite: design4Products[0].status === 'active' ? 'disponible' : 'indisponible',
+                      prix1: design4Products[0].prix,
+                      image: design4Products[0].imageUrl ? { uri: design4Products[0].imageUrl } : undefined,
+                      vendeur: design4Products[0].vendeur || 'Boutique Premium',
+                      ventes: `${Math.floor(Math.random() * 300) + 50} ventes`,
+                    }}
+                    onPressItem={createOnPressItem(design4Products[0])}
+                    secondItem={
+                      design4Products.length > 1
+                        ? {
+                            titre: design4Products[1].titre,
+                            disponibilite: design4Products[1].status === 'active' ? 'disponible' : 'indisponible',
+                            prix1: design4Products[1].prix,
+                            image: design4Products[1].imageUrl ? { uri: design4Products[1].imageUrl } : undefined,
+                            vendeur: design4Products[1].vendeur || 'Boutique Exclusive',
+                            ventes: `${Math.floor(Math.random() * 180) + 20} ventes`,
+                          }
+                        : undefined
+                    }
+                    thirdItem={
+                      design4Products.length > 2
+                        ? {
+                            titre: design4Products[2].titre,
+                            disponibilite: design4Products[2].status === 'active' ? 'disponible' : 'indisponible',
+                            prix1: design4Products[2].prix,
+                            image: design4Products[2].imageUrl ? { uri: design4Products[2].imageUrl } : undefined,
+                            vendeur: design4Products[2].vendeur || 'Boutique Luxe',
+                            ventes: `${Math.floor(Math.random() * 150) + 15} ventes`,
+                          }
+                        : undefined
+                    }
+                  />
+                )}
+              </View>
+            </View>
+          </View>
+
+          {/* Section 6: Design 6 - Deux éléments égaux côte à côte */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Sélection Duo</Text>
+              <Text style={styles.sectionSubtitle}>Produits complémentaires</Text>
+            </View>
+
+            <View style={[styles.pinterestOuterContainer, { marginBottom: 0, paddingBottom: 0, height: 'auto' }]}>
+              {/* Affichage du composant ItemDesign6 avec 2 éléments de taille égale */}
+              <View style={styles.pinterestSingleContainer}>
+                <ItemDesign6
+                  articles={design4Products.map((product, idx) => ({
+                    titre: product.titre,
+                    disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+                    prix: product.prix,
+                    imageUrl: product.imageUrl,
+                    vendeur: product.vendeur || `Boutique Premium ${idx + 1}`,
+                    ventes: `${Math.floor(Math.random() * (300 - idx * 50)) + (50 - idx * 10)} ventes`,
+                    status: product.status,
+                  }))}
+                  onPressItem={index => createOnPressItem(design4Products[index])()}
+                />
               </View>
             </View>
           </View>
@@ -748,6 +819,39 @@ export default function HomeComponent() {
   return (
     <>
       <Header />
+      {/* Section 1: Design 1 - Horizontal */}
+      <View style={styles.sectionContainer}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Produits populaires</Text>
+        </View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 20, paddingHorizontal: 0, justifyContent: 'center', width: '100%' }}
+          removeClippedSubviews={true}>
+          {/* Afficher le produit principal */}
+          <ItemDesign1 article={article} onPressItem={createOnPressItem(item)} key={`${item.id}_main`} />
+
+          {/* Afficher les produits suivants */}
+          {design1Products.map((product, idx) => {
+            const productArticle = {
+              titre: product.titre,
+              disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+              prix1: product.prix,
+              image: product.imageUrl ? { uri: product.imageUrl } : undefined,
+              vendeur: product.vendeur,
+              ventes: product.ventes,
+            };
+            return (
+              <ItemDesign1
+                article={productArticle}
+                onPressItem={createOnPressItem(product)}
+                key={`${product.id}_design1_${idx}`}
+              />
+            );
+          })}
+        </ScrollView>
+      </View>
       {data.length > 0 ? (
         <FlatList
           style={styles.flatListContainer}
@@ -757,7 +861,7 @@ export default function HomeComponent() {
           onEndReached={fetchMoreData}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooterLoader}
-          contentContainerStyle={{ padding: 10 }}
+          contentContainerStyle={{ padding: 0 }}
           ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
           removeClippedSubviews={true}
           maxToRenderPerBatch={5}
