@@ -12,30 +12,23 @@ function ItemDesign3({ article = {} as any, onPressItem }: ItemProps) {
     prix1 = '¥299',
     image = require('../../../../../assets/images/home/gm4.webp'),
   } = article || {};
-  
+
   // Valeurs supplémentaires pour le design premium (valeurs par défaut)
   const vendeur = article.vendeur || 'Boutique Premium';
   const ventes = article.ventes || '128 ventes';
 
   // Déterminer les couleurs du gradient en fonction de la disponibilité
-  const gradientColors = disponibilite === 'disponible' 
-    ? ['#6A11CB', '#2575FC'] as const
-    : ['#333333', '#666666'] as const;
+  const gradientColors =
+    disponibilite === 'disponible' ? (['#6A11CB', '#2575FC'] as const) : (['#333333', '#666666'] as const);
 
   return (
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() => {
         onPressItem();
-      }}
-    >
+      }}>
       <View style={styles.container}>
-        <LinearGradient
-          colors={gradientColors}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.card}
-        >
+        <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.card}>
           {/* Badge Premium */}
           <View style={styles.premiumBadge}>
             <Ionicons name="diamond" size={12} color="#FFD700" />
@@ -46,27 +39,34 @@ function ItemDesign3({ article = {} as any, onPressItem }: ItemProps) {
           <View style={styles.contentRow}>
             {/* Informations du produit */}
             <View style={styles.infoContainer}>
-              <Text style={styles.title} numberOfLines={2}>{titre}</Text>
-              
+              <Text style={styles.title} numberOfLines={2}>
+                {titre}
+              </Text>
+
               <View style={styles.shopInfo}>
                 <Ionicons name="storefront-outline" size={12} color="#FFFFFF" />
                 <Text style={styles.shopName}>{vendeur}</Text>
               </View>
-              
+
               <View style={styles.salesInfo}>
                 <Ionicons name="trending-up" size={12} color="#FFFFFF" />
                 <Text style={styles.salesText}>{ventes}</Text>
               </View>
-              
+
               <View style={styles.priceContainer}>
                 <Text style={styles.price}>{prix1}</Text>
                 <View style={styles.statusIndicator}>
-                  <View style={[styles.statusDot, { backgroundColor: disponibilite === 'disponible' ? '#4AFF8F' : '#FF5252' }]} />
+                  <View
+                    style={[
+                      styles.statusDot,
+                      { backgroundColor: disponibilite === 'disponible' ? '#4AFF8F' : '#FF5252' },
+                    ]}
+                  />
                   <Text style={styles.statusText}>{disponibilite}</Text>
                 </View>
               </View>
             </View>
-            
+
             {/* Image du produit */}
             <View style={styles.imageContainer}>
               <Image
@@ -76,17 +76,17 @@ function ItemDesign3({ article = {} as any, onPressItem }: ItemProps) {
               />
             </View>
           </View>
-          
+
           {/* Boutons d'action */}
           <View style={styles.actionContainer}>
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons name="heart-outline" size={18} color="#FFFFFF" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.actionButton}>
               <Ionicons name="share-social-outline" size={18} color="#FFFFFF" />
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={[styles.actionButton, styles.cartButton]}>
               <Ionicons name="cart-outline" size={18} color="#FFFFFF" />
               <Text style={styles.cartText}>Ajouter</Text>
@@ -101,10 +101,11 @@ function ItemDesign3({ article = {} as any, onPressItem }: ItemProps) {
 const styles = StyleSheet.create({
   container: {
     marginVertical: 12,
-    paddingHorizontal: 4,
+    paddingLeft: 3,
+    // paddingRight: 4,
   },
   card: {
-    width: 320,
+    width: 340,
     borderRadius: 16,
     padding: 16,
     overflow: 'hidden',

@@ -27,18 +27,13 @@ function ItemDesign2({ article = {} as any, onPressItem }: ItemProps) {
             style={styles.image}
             resizeMode="contain"
           />
-          
-          {/* Badge de disponibilité */}
-          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
-            <Text style={styles.statusText}>{disponibilite}</Text>
-          </View>
         </View>
 
         <View style={styles.contentContainer}>
           <Text style={styles.title} numberOfLines={2}>
             {titre}
           </Text>
-          
+
           <View style={styles.footer}>
             <Text style={styles.price}>{prix1}</Text>
             <TouchableOpacity style={styles.favoriteButton}>
@@ -53,11 +48,14 @@ function ItemDesign2({ article = {} as any, onPressItem }: ItemProps) {
 
 const styles = StyleSheet.create({
   container: {
-    width: 160,
-    marginHorizontal: 6,
+    width: 150,
+    // height: 150,
+    marginRight: 6,
+    paddingLeft: 3,
     marginVertical: 10,
+    backgroundSize: 'content',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -66,16 +64,16 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   imageContainer: {
-    height: 160,
-    width: '100%',
-    backgroundColor: '#F5F5F5',
+    height: 150,
+    width: '90%',
+    backgroundColor: 'transparent',
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
   },
   image: {
-    height: '85%',
-    width: '85%',
+    height: '100%',
+    width: '100%',
     resizeMode: 'contain',
   },
   statusBadge: {
@@ -93,27 +91,29 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   contentContainer: {
-    padding: 10,
+    paddingVertical: 1,
     backgroundColor: '#FFFFFF',
   },
   title: {
     fontSize: 12,
     fontWeight: '600',
     color: '#333333',
-    marginBottom: 6,
+    marginBottom: 5,
     lineHeight: 16,
-    height: 32,
+    height: 28,
+  },
+  price: {
+    color: '#FF4500',
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 0,
+    marginBottom: 0,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 4,
-  },
-  price: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FF4500',
+    marginTop: 0,
   },
   favoriteButton: {
     padding: 4,

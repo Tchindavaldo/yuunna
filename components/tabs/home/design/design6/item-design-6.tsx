@@ -72,39 +72,17 @@ function ItemDesign6({
                 />
                 <View style={styles.overlay} />
 
-                {/* Badge de disponibilité */}
-                {!isAvailable && (
-                  <View style={styles.unavailableBadge}>
-                    <Text style={styles.unavailableText}>Rupture de stock</Text>
-                  </View>
-                )}
-
                 {/* Bouton favori */}
                 <TouchableOpacity style={styles.favoriteButton}>
                   <Ionicons name="heart-outline" size={18} color="#FFFFFF" />
                 </TouchableOpacity>
-
-                {/* Badge de prix */}
-                <View style={styles.regularPriceBadge}>
-                  <Text style={styles.regularPrice}>{item.prix}</Text>
-                </View>
-
-                {/* Badge de ventes */}
-                <View style={styles.salesBadge}>
-                  <Ionicons name="trending-up" size={12} color="#FFF" />
-                  <Text style={styles.salesText}>{item.ventes}</Text>
-                </View>
               </View>
 
               <View style={styles.infoContainer}>
                 <Text style={styles.title} numberOfLines={1}>
                   {item.titre}
                 </Text>
-                <View style={styles.shopRow}>
-                  <View style={styles.shopBadge}>
-                    <Text style={styles.shopText}>{item.vendeur}</Text>
-                  </View>
-                </View>
+                <Text style={styles.price}>{item.prix}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -125,19 +103,6 @@ function ItemDesign6({
               style={styles.image}
               resizeMode="cover"
             />
-            {/* Overlay coloré avec dégradé violet */}
-            <View style={styles.colorOverlay1} />
-
-            {/* Badge de prix avec design hexagonal */}
-            <View style={styles.hexagonPriceBadge}>
-              <Text style={styles.hexagonPrice}>{leftSmallItem.prix}</Text>
-            </View>
-
-            {/* Badge de ventes avec design amélioré */}
-            <View style={styles.enhancedSalesBadge}>
-              <Ionicons name="trending-up" size={10} color="#FFF" />
-              <Text style={styles.enhancedSalesText}>{leftSmallItem.ventes}</Text>
-            </View>
           </View>
 
           {/* Informations du produit avec design amélioré */}
@@ -145,10 +110,7 @@ function ItemDesign6({
             <Text style={styles.enhancedTitle} numberOfLines={1}>
               {leftSmallItem.titre}
             </Text>
-            <View style={styles.shopIndicator}>
-              <View style={styles.shopDot} />
-              <Text style={styles.smallShopText}>{leftSmallItem.vendeur}</Text>
-            </View>
+            <Text style={styles.enhancedPrice}>{leftSmallItem.prix}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -170,19 +132,6 @@ function ItemDesign6({
               style={styles.image}
               resizeMode="cover"
             />
-            {/* Overlay coloré avec dégradé turquoise */}
-            <View style={styles.colorOverlay2} />
-
-            {/* Badge de prix avec design hexagonal */}
-            <View style={styles.hexagonPriceBadge}>
-              <Text style={styles.hexagonPrice}>{rightSmallItem.prix}</Text>
-            </View>
-
-            {/* Badge de ventes avec design amélioré */}
-            <View style={styles.enhancedSalesBadge}>
-              <Ionicons name="trending-up" size={10} color="#FFF" />
-              <Text style={styles.enhancedSalesText}>{rightSmallItem.ventes}</Text>
-            </View>
           </View>
 
           {/* Informations du produit avec design amélioré */}
@@ -190,10 +139,7 @@ function ItemDesign6({
             <Text style={styles.enhancedTitle} numberOfLines={1}>
               {rightSmallItem.titre}
             </Text>
-            <View style={styles.shopIndicator}>
-              <View style={styles.shopDot} />
-              <Text style={styles.smallShopText}>{rightSmallItem.vendeur}</Text>
-            </View>
+            <Text style={styles.enhancedPrice}>{rightSmallItem.prix}</Text>
           </View>
         </TouchableOpacity>
 
@@ -216,44 +162,18 @@ function ItemDesign6({
                   style={styles.image}
                   resizeMode="cover"
                 />
-                <View style={styles.overlay} />
-
-                {/* Badge de disponibilité */}
-                {!isAvailable && (
-                  <View style={styles.unavailableBadge}>
-                    <Text style={styles.unavailableText}>Rupture de stock</Text>
-                  </View>
-                )}
 
                 {/* Bouton favori */}
                 <TouchableOpacity style={styles.favoriteButton}>
                   <Ionicons name="heart-outline" size={18} color="#FFFFFF" />
                 </TouchableOpacity>
-
-                {/* Badge de prix */}
-                <View style={styles.ribbonPriceBadge}>
-                  <Text style={styles.ribbonPrice}>{item.prix}</Text>
-                </View>
-
-                {/* Badge de ventes */}
-                <View style={styles.cornerSalesBadge}>
-                  <Ionicons name="rocket" size={12} color="#FFF" />
-                  <Text style={styles.cornerSalesText}>{item.ventes}</Text>
-                </View>
               </View>
 
               <View style={styles.infoContainer}>
                 <Text style={styles.title} numberOfLines={1}>
                   {item.titre}
                 </Text>
-                <View style={styles.tagContainer}>
-                  <View style={styles.productTag}>
-                    <Text style={styles.tagText}>Exclusif</Text>
-                  </View>
-                  <View style={styles.productTag2}>
-                    <Text style={styles.tagText}>Promo</Text>
-                  </View>
-                </View>
+                <Text style={styles.price}>{item.prix}</Text>
               </View>
             </TouchableOpacity>
           );
@@ -304,27 +224,16 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '60%',
     position: 'relative',
+    backgroundColor: 'transparent',
   },
 
-  // Styles pour les overlays colorés
+  // Styles pour les overlays colorés (supprimés)
   colorOverlay1: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(156, 39, 176, 0.15)', // Violet transparent
-    borderRadius: 12,
+    display: 'none',
   },
 
   colorOverlay2: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 188, 212, 0.15)', // Turquoise transparent
-    borderRadius: 12,
+    display: 'none',
   },
 
   // Styles pour les badges de ventes améliorés
@@ -358,6 +267,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 4,
+  },
+
+  enhancedPrice: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#E91E63',
     marginBottom: 4,
   },
 
@@ -405,6 +321,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 220, // Hauteur standard encore plus grande
     position: 'relative',
+    backgroundColor: 'transparent',
   },
 
   // Image
@@ -415,15 +332,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 12,
   },
 
-  // Overlay générique
+  // Overlay générique (supprimé)
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    display: 'none',
   },
 
   // Overlay pour le premier élément
@@ -460,6 +371,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+
+  // Badges de disponibilité supprimés
 
   // Bouton favori
   favoriteButton: {
@@ -594,6 +507,14 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
+    marginBottom: 5,
+  },
+
+  // Prix de l'article
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#E91E63',
     marginBottom: 5,
   },
 

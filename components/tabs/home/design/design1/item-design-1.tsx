@@ -8,7 +8,7 @@ import Carousel from 'react-native-reanimated-carousel';
 
 function ItemDesign1({ article, onPressItem }: ItemProps) {
   const { width } = useWindowDimensions();
-  const carouselWidth = width - 32; // Marges de 16px de chaque côté
+  const carouselWidth = width * 1; // Augmentation de la largeur à 85% de l'écran
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Données du carrousel
@@ -126,8 +126,9 @@ function ItemDesign1({ article, onPressItem }: ItemProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 16,
+    marginTop: 14,
     alignItems: 'center',
+    width: '100%',
   },
   carouselItem: {
     borderRadius: 16,
@@ -187,9 +188,11 @@ const styles = StyleSheet.create({
   },
   paginationContainer: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
+    width: '100%',
     alignItems: 'center',
     marginTop: 12,
+    marginRight: 32,
   },
   paginationDot: {
     width: 8,
