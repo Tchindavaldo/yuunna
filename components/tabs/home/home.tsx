@@ -1,6 +1,6 @@
 import Routes from '@/app/(route)/routes';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -12,14 +12,16 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { fetchProducts } from '../../../store/productSlice';
+import { Product } from '../../../store/types';
 import BottomNav from '../../gloabal/bottom-nav';
 import ItemDesign1 from './design/design1/item-design-1';
 import ItemDesign2 from './design/design2/item-design-2';
+import ItemDesign3 from './design/design3/item-design-3';
+import ItemDesign4 from './design/design4/item-design-4';
 import Header from './header/header';
 import { useNavigateWithData } from './utils/navigate';
-import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchProducts, resetProducts } from '../../../store/productSlice';
-import { Product } from '../../../store/types';
 
 const PAGE_SIZE = 10;
 
@@ -34,6 +36,131 @@ const styles = StyleSheet.create({
   itemSeparator: {
     height: 10,
     backgroundColor: 'white',
+  },
+  // Styles pour les sections
+  sectionContainer: {
+    marginBottom: 20,
+    backgroundColor: 'white',
+  },
+  sectionHeader: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  // Styles pour Pinterest/Taobao
+  pinterestOuterContainer: {
+    marginTop: 10,
+    marginBottom: 30,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+    padding: 10,
+  },
+  pinterestTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+    marginLeft: 8,
+  },
+  pinterestDirectContainer: {
+    position: 'relative',
+    width: '100%',
+    height: 650, // Hauteur fixe pour contenir tous les éléments
+  },
+  pinterestItem1: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '60%',
+    height: 320,
+    zIndex: 1,
+  },
+  pinterestItem2: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '38%',
+    height: 150,
+    zIndex: 2,
+  },
+  pinterestItem3: {
+    position: 'absolute',
+    top: 160,
+    right: 0,
+    width: '38%',
+    height: 150,
+    zIndex: 3,
+  },
+  pinterestItem4: {
+    position: 'absolute',
+    top: 330,
+    left: 0,
+    width: '100%',
+    height: 320,
+    zIndex: 4,
+  },
+  pinterestGrid: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+  },
+  pinterestSingleContainer: {
+    width: '100%',
+    alignItems: 'flex-start',
+    paddingHorizontal: 4,
+  },
+  pinterestRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  pinterestLeftLarge: {
+    width: '58%', // Plus large pour le design 4
+  },
+  pinterestRightLarge: {
+    width: '40%', // Plus étroit pour le design 2
+  },
+  pinterestRightColumn: {
+    width: '40%',
+    justifyContent: 'space-between',
+  },
+  pinterestRightItem: {
+    marginBottom: 10,
+  },
+  // Anciens styles maintenus pour compatibilité
+  pinterestContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  pinterestColumn: {
+    width: '48%',
+    flexDirection: 'column',
+  },
+  pinterestItemWrapper: {
+    marginBottom: 16,
+  },
+  pinterestSpacer: {
+    height: 0,
+    marginBottom: 0,
+  },
+  pinterestHeader: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    marginTop: 10,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 2,
   },
   loaderContainer: {
     flex: 1,
@@ -151,13 +278,56 @@ const styles = StyleSheet.create({
 export default function HomeComponent() {
   const navigateWithData = useNavigateWithData();
   const dispatch = useAppDispatch();
-  const { items: data, loading, page, hasMore } = useAppSelector((state) => state.products);
+  const { items: data, loading, page, hasMore } = useAppSelector(state => state.products);
   const [loaderType, setLoaderType] = useState<'default' | 'pulse' | 'dots' | 'progress' | 'skeleton'>('pulse');
+  const [isInitialLoadDone, setIsInitialLoadDone] = useState(false); // Flag pour éviter les appels multiples
 
   // Animations
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
   const progressAnim = React.useRef(new Animated.Value(0)).current;
   const dotsAnim = React.useRef(new Animated.Value(0)).current;
+
+  // Fonction pour charger les données initiales (première page)
+  const loadInitialData = useCallback(async () => {
+    // Vérifier si les données sont déjà chargées ou en cours de chargement
+    if (loading || data.length > 0 || isInitialLoadDone) {
+      console.log(
+        '[HOME] Chargement initial ignoré:',
+        loading ? 'chargement en cours' : data.length > 0 ? 'données déjà chargées' : 'déjà fait'
+      );
+      return;
+    }
+
+    try {
+      console.log('[HOME] Démarrage du chargement initial (page 1)');
+      // Réinitialiser la page à 1 et charger les données initiales
+      await dispatch(fetchProducts({ page: 1, limit: PAGE_SIZE }));
+      console.log('[HOME] Chargement initial terminé avec succès');
+    } catch (error) {
+      console.error('[HOME] Erreur lors du chargement initial des produits:', error);
+    }
+  }, [dispatch, loading, data.length, isInitialLoadDone]);
+
+  // Fonction pour charger plus de données (pagination)
+  const fetchMoreData = useCallback(async () => {
+    // Vérifier si un chargement est déjà en cours ou s'il n'y a plus de données
+    if (loading || !hasMore) {
+      console.log('[HOME] Pas de chargement supplémentaire:', loading ? 'chargement en cours' : 'plus de données');
+      return;
+    }
+
+    try {
+      // Utiliser la page actuelle + 1 pour charger la page suivante
+      const nextPage = page + 1;
+      console.log(`[HOME] Démarrage du chargement de la page ${nextPage} (${data.length} produits déjà chargés)`);
+
+      // Charger la page suivante
+      await dispatch(fetchProducts({ page: nextPage, limit: PAGE_SIZE }));
+      console.log(`[HOME] Chargement de la page ${nextPage} terminé avec succès`);
+    } catch (error) {
+      console.error('[HOME] Erreur lors du chargement des produits supplémentaires:', error);
+    }
+  }, [dispatch, loading, hasMore, page, data.length]);
 
   useEffect(() => {
     if (loading) {
@@ -199,51 +369,248 @@ export default function HomeComponent() {
     }
   }, [loading, pulseAnim, progressAnim, dotsAnim]);
 
+  // Effet pour charger les données initiales une seule fois au montage du composant
   useEffect(() => {
-    // Charger les données initiales
-    fetchData();
-    
-    // Nettoyer les données lors du démontage du composant
-    return () => {
-      dispatch(resetProducts());
-    };
+    console.log('[HOME] Initialisation du composant Home - État actuel:', {
+      dataLength: data.length,
+      loading,
+      isInitialLoadDone,
+      page,
+      hasMore,
+    });
+
+    // Vérifier si les données sont déjà chargées ou en cours de chargement
+    if (data.length === 0 && !loading && !isInitialLoadDone) {
+      console.log('[HOME] Démarrage du chargement initial depuis useEffect');
+      setIsInitialLoadDone(true); // Marquer comme fait pour éviter les appels répétés
+      loadInitialData();
+    }
+
+    // Ne pas nettoyer les données lors du démontage pour éviter de perdre l'état
+    // entre les navigations
+  }, [data.length, loading, isInitialLoadDone]);
+
+  // Mémoiser la fonction onPressItem pour éviter les recréations à chaque rendu
+  const createOnPressItem = useCallback(
+    (item: Product) => {
+      return () => {
+        navigateWithData(Routes.tabs.home.detail, { product: item });
+      };
+    },
+    [navigateWithData]
+  );
+
+  // Fonction pour obtenir les produits suivants dans la liste
+  // Utilise un offset fixe basé sur l'ID du produit pour assurer la cohérence
+  const getNextProducts = useCallback(
+    (baseProduct: Product, count: number) => {
+      // Utiliser l'ID du produit pour générer un hash numérique stable
+      const getStableHash = (id: string) => {
+        let hash = 0;
+        for (let i = 0; i < id.length; i++) {
+          hash = (hash << 5) - hash + id.charCodeAt(i);
+          hash |= 0; // Convertir en entier 32 bits
+        }
+        return Math.abs(hash);
+      };
+
+      const baseHash = getStableHash(baseProduct.id);
+      const result = [];
+
+      // Créer un tableau d'indices stables basés sur le hash du produit
+      const stableIndices = Array.from({ length: count }, (_, i) => {
+        return (baseHash + i + 1) % data.length;
+      });
+
+      // Récupérer les produits aux indices calculés
+      for (const idx of stableIndices) {
+        result.push(data[idx]);
+      }
+
+      return result;
+    },
+    [data]
+  );
+
+  // Fonction pour déterminer si un produit doit être affiché comme premium
+  const isPremiumProduct = useCallback((product: Product) => {
+    // Logique pour déterminer si un produit est premium
+    // Par exemple, basé sur le prix, la catégorie, etc.
+    return product.prix && parseFloat(product.prix.replace(/[^0-9.]/g, '')) > 50;
   }, []);
 
-  const fetchData = async () => {
-    if (loading || !hasMore) return;
-    
-    try {
-      // Utiliser le thunk pour récupérer les produits
-      await dispatch(fetchProducts({ page, limit: PAGE_SIZE }));
-    } catch (error) {
-      console.error('Erreur lors du chargement des produits:', error);
-    }
-  };
+  // Mémoiser la fonction renderItem pour éviter les recréations à chaque rendu
+  const renderItem = useCallback(
+    ({ item, index }: { item: Product; index: number }) => {
+      // Récupérer des produits supplémentaires pour les designs
+      const design1Products = getNextProducts(item, 2);
+      const design2Products = getNextProducts(item, 3);
+      const design4Products = getNextProducts(item, 4); // Produits pour le design Pinterest/Taobao
 
-  const renderItem = ({ item }: { item: Product }) => {
-    // Adapter le format du produit pour correspondre à l'interface ItemProps
-    const article = {
-      titre: item.titre,
-      disponibilite: item.status === 'active' ? 'disponible' : 'indisponible',
-      prix1: item.prix,
-      // Utiliser l'imageUrl pour afficher l'image du produit
-      image: item.imageUrl ? { uri: item.imageUrl } : undefined
-    };
-    
-    // Fonction onPress pour la navigation
-    const onPressItem = () => {
-      navigateWithData(Routes.tabs.home.detail, { product: item });
-    };
+      // Adapter le format du produit pour correspondre à l'interface ItemProps
+      const article = {
+        titre: item.titre,
+        disponibilite: item.status === 'active' ? 'disponible' : 'indisponible',
+        prix1: item.prix,
+        image: item.imageUrl ? { uri: item.imageUrl } : undefined,
+        vendeur: item.vendeur,
+        ventes: item.ventes,
+      };
 
-    // Alterner entre les deux designs pour la démonstration
-    const isEvenId = parseInt(item.id, 10) % 2 === 0;
+      return (
+        <View>
+          {/* Section 1: Design 1 - Horizontal */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Produits populaires</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 20, paddingHorizontal: 15 }}
+              removeClippedSubviews={true}>
+              {/* Afficher le produit principal */}
+              <ItemDesign1 article={article} onPressItem={createOnPressItem(item)} key={`${item.id}_main`} />
 
-    if (isEvenId) {
-      return <ItemDesign1 article={article} onPressItem={onPressItem} />;
-    } else {
-      return <ItemDesign2 article={article} onPressItem={onPressItem} />;
-    }
-  };
+              {/* Afficher les produits suivants */}
+              {design1Products.map((product, idx) => {
+                const productArticle = {
+                  titre: product.titre,
+                  disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+                  prix1: product.prix,
+                  image: product.imageUrl ? { uri: product.imageUrl } : undefined,
+                  vendeur: product.vendeur,
+                  ventes: product.ventes,
+                };
+                return (
+                  <ItemDesign1
+                    article={productArticle}
+                    onPressItem={createOnPressItem(product)}
+                    key={`${product.id}_design1_${idx}`}
+                  />
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* Section 2: Design 2 - Horizontal */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Nouveautés</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 15, paddingHorizontal: 15 }}
+              removeClippedSubviews={true}>
+              {design2Products.map((product, idx) => {
+                const productArticle = {
+                  titre: product.titre,
+                  disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+                  prix1: product.prix,
+                  image: product.imageUrl ? { uri: product.imageUrl } : undefined,
+                  vendeur: product.vendeur,
+                  ventes: product.ventes,
+                };
+
+                return (
+                  <ItemDesign2
+                    article={productArticle}
+                    onPressItem={createOnPressItem(product)}
+                    key={`${product.id}_design2_${idx}`}
+                  />
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          {/* Section 3: Design 3 - Premium */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Produits Premium</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ gap: 15, paddingHorizontal: 15 }}
+              removeClippedSubviews={true}>
+              {/* Produits premium */}
+              {data
+                .slice(0, 4)
+                .map((product, idx) => {
+                  if (isPremiumProduct(product)) {
+                    const productArticle = {
+                      titre: product.titre,
+                      disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+                      prix1: product.prix,
+                      image: product.imageUrl ? { uri: product.imageUrl } : undefined,
+                      vendeur: product.vendeur || 'Boutique Officielle',
+                      ventes: product.ventes || '256 ventes',
+                    };
+
+                    return (
+                      <ItemDesign3
+                        article={productArticle}
+                        onPressItem={createOnPressItem(product)}
+                        key={`${product.id}_design3_${idx}`}
+                      />
+                    );
+                  }
+                  return null;
+                })
+                .filter(Boolean)}
+
+              {/* Ajouter un exemple de design premium pour démonstration */}
+              <ItemDesign3
+                article={{
+                  titre: 'Produit Premium Exclusif',
+                  disponibilite: 'disponible',
+                  prix1: '¥399',
+                  image: data[0].imageUrl ? { uri: data[0].imageUrl } : undefined,
+                  vendeur: 'Boutique Officielle',
+                  ventes: '256 ventes',
+                }}
+                onPressItem={() => console.log('Produit premium cliqué')}
+              />
+            </ScrollView>
+          </View>
+
+          {/* Section 4: Design 4 - Pinterest/Taobao */}
+          <View style={styles.sectionContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Découvrir</Text>
+              <Text style={styles.sectionSubtitle}>Tendances populaires</Text>
+            </View>
+
+            <View style={styles.pinterestOuterContainer}>
+              <Text style={styles.pinterestTitle}>Style Pinterest/Taobao</Text>
+
+              {/* Affichage d'un seul élément ItemDesign4 */}
+              <View style={styles.pinterestSingleContainer}>
+                {design4Products.length > 0 && (
+                  <ItemDesign4
+                    article={{
+                      titre: design4Products[0].titre,
+                      disponibilite: design4Products[0].status === 'active' ? 'disponible' : 'indisponible',
+                      prix1: design4Products[0].prix,
+                      image: design4Products[0].imageUrl ? { uri: design4Products[0].imageUrl } : undefined,
+                      vendeur: design4Products[0].vendeur || 'Boutique Tendance',
+                      ventes: `${Math.floor(Math.random() * 200) + 10} ventes`,
+                    }}
+                    onPressItem={createOnPressItem(design4Products[0])}
+                  />
+                )}
+              </View>
+            </View>
+          </View>
+        </View>
+      );
+    },
+    [createOnPressItem, data, getNextProducts]
+  );
+
+  // Mémoiser la fonction d'extraction de clé pour la FlatList
+  const keyExtractor = useCallback((item: Product) => `product_${item.id}`, []);
 
   const renderLoader = () => {
     // Si c'est le chargement initial (pas de données)
@@ -371,6 +738,13 @@ export default function HomeComponent() {
     setLoaderType(types[nextIndex]);
   };
 
+  // Log pour le rendu du composant - uniquement quand les données changent réellement
+  useEffect(() => {
+    if (data.length > 0) {
+      console.log(`[HOME] Rendu du composant avec ${data.length} produits, page ${page}, hasMore: ${hasMore}`);
+    }
+  }, [data.length, page, hasMore]);
+
   return (
     <>
       <Header />
@@ -379,12 +753,17 @@ export default function HomeComponent() {
           style={styles.flatListContainer}
           data={data}
           renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          onEndReached={fetchData}
+          keyExtractor={keyExtractor}
+          onEndReached={fetchMoreData}
           onEndReachedThreshold={0.5}
           ListFooterComponent={renderFooterLoader}
           contentContainerStyle={{ padding: 10 }}
           ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={5}
+          windowSize={10}
+          initialNumToRender={3}
+          updateCellsBatchingPeriod={50}
         />
       ) : (
         renderLoader()

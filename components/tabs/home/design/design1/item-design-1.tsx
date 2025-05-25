@@ -1,31 +1,49 @@
 import { ItemProps } from '@/interface/itemsProps';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { memo } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ItemDesign1({ article, onPressItem }: ItemProps) {
+function ItemDesign1({ article, onPressItem }: ItemProps) {
+  // Extraire les valeurs de l'objet article avec des valeurs par défaut
+  const {
+    titre = 'Produit sans titre',
+    disponibilite = 'indisponible',
+    prix1 = '0f',
+    image = require('../../../../../assets/images/home/gmx.png'),
+  } = article || {};
+
+  // Déterminer la couleur du badge de disponibilité
+  const statusColor = disponibilite === 'disponible' ? '#4CAF50' : '#FF5252';
+  
   return (
     <TouchableOpacity
-      activeOpacity={0.8}
+      activeOpacity={0.7}
       onPress={() => {
         onPressItem();
       }}>
       <View style={styles.card}>
-        <View style={styles.leftColumn}>
-          <Text style={styles.title}>Pain Omelettes</Text>
-          <Text style={styles.status}>indisponible</Text>
-          <View style={styles.rowPriceTime}>
-            <Text style={styles.price}>500f</Text>
-            <Text style={styles.time}>15-20min</Text>
-          </View>
-        </View>
-
-        <View style={styles.rightColumn}>
+        <View style={styles.imageContainer}>
           <Image
-            source={require('../../../../../assets/images/home/gmx.png')}
+            source={typeof image === 'object' ? image : require('../../../../../assets/images/home/gmx.png')}
             style={styles.image}
             resizeMode="contain"
           />
+          <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
+            <Text style={styles.statusText}>{disponibilite}</Text>
+          </View>
+        </View>
+        
+        <View style={styles.contentContainer}>
+          <Text style={styles.title} numberOfLines={2}>
+            {titre}
+          </Text>
+          
+          <View style={styles.footer}>
+            <Text style={styles.price}>{prix1}</Text>
+            <View style={styles.deliveryInfo}>
+              <Text style={styles.deliveryTime}>15-20 min</Text>
+            </View>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -34,63 +52,85 @@ export default function ItemDesign1({ article, onPressItem }: ItemProps) {
 
 const styles = StyleSheet.create({
   card: {
-    width: 300,
-    height: 160,
-    backgroundColor: 'darkred',
-    borderRadius: 15,
+    width: 320,
+    height: 140,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     flexDirection: 'row',
-    padding: 16,
-    marginBottom: 15,
-    marginTop: 20,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
     overflow: 'hidden',
   },
-  leftColumn: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  rightColumn: {
-    flex: 1,
-    alignItems: 'flex-end',
+  imageContainer: {
+    width: 140,
+    height: '100%',
+    backgroundColor: '#F5F5F5',
     justifyContent: 'center',
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    color: 'white',
-    marginBottom: 8,
-  },
-  status: {
-    fontSize: 11,
-    color: 'white',
-    marginBottom: 8,
-  },
-  rowPriceTime: {
-    flexDirection: 'row',
     alignItems: 'center',
-  },
-  price: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: '900',
-    marginRight: 12,
-  },
-  time: {
-    color: 'white',
-    fontSize: 10,
+    position: 'relative',
   },
   image: {
-    width: 80,
-    height: 80,
-    transform: [{ scale: 1.5 }],
-    marginRight: -10,
-    marginTop: 10,
+    width: '90%',
+    height: '90%',
+    resizeMode: 'contain',
+  },
+  statusBadge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    backgroundColor: '#4CAF50',
+  },
+  statusText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 12,
+    justifyContent: 'space-between',
+  },
+  title: {
+    fontWeight: '600',
+    fontSize: 14,
+    color: '#333333',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  price: {
+    color: '#FF4500',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  deliveryInfo: {
+    backgroundColor: '#F0F0F0',
+    borderRadius: 4,
+    padding: 4,
+  },
+  deliveryTime: {
+    color: '#666666',
+    fontSize: 10,
+    fontWeight: '500',
   },
 });
 
 // Définition des PropTypes ici
 ItemDesign1.propTypes = {
   onPressItem: PropTypes.func.isRequired, // une fonction obligatoire
-  data: PropTypes.arrayOf(PropTypes.object),
+  article: PropTypes.object,
 };
+
+// Exporter le composant mémoisé pour éviter les rendus inutiles
+export default memo(ItemDesign1);
