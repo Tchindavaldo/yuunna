@@ -16,6 +16,7 @@ function ItemDesign4({
     disponibilite = 'disponible',
     prix1 = '¥199',
     image = require('../../../../../assets/images/home/gm4.webp'),
+    titreOriginal = 'Produit Tendance',
   } = article || {};
 
   // Valeurs supplémentaires pour le design tendance (valeurs par défaut)
@@ -158,7 +159,7 @@ function ItemDesign4({
         {/* Informations du produit */}
         <View style={styles.infoContainer}>
           <Text style={styles.title} numberOfLines={2}>
-            {titre}
+            {titreOriginal}
           </Text>
 
           <View style={styles.priceRow}>

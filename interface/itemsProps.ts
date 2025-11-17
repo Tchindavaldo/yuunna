@@ -3,6 +3,7 @@ import { ImageSourcePropType } from 'react-native';
 export interface ItemProps {
   article?: {
     titre?: string;
+    titreOriginal: string;
     disponibilite?: string;
     prix1?: string | number;
     image?: ImageSourcePropType;

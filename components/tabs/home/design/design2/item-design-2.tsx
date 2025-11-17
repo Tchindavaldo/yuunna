@@ -1,14 +1,16 @@
 import { ItemProps } from '@/interface/itemsProps';
+import { Product } from '@/store/types';
 import { Ionicons } from '@expo/vector-icons';
 import React, { memo } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-function ItemDesign2({ article = {} as any, onPressItem }: ItemProps) {
+function ItemDesign2({ article = { titreOriginal: 'Titre original par défaut' }, onPressItem }: ItemProps) {
   const {
     titre = 'Titre par défaut',
     disponibilite = 'indisponible',
     prix1 = '0 f',
     image = require('../../../../../assets/images/home/gm4.webp'), // image locale par défaut
+    titreOriginal = 'Titre original par défaut',
   } = article || {};
 
   // Déterminer la couleur du badge de disponibilité
@@ -31,7 +33,7 @@ function ItemDesign2({ article = {} as any, onPressItem }: ItemProps) {
 
         <View style={styles.contentContainer}>
           <Text style={styles.title} numberOfLines={2}>
-            {titre}
+            {titreOriginal}
           </Text>
 
           <View style={styles.footer}>

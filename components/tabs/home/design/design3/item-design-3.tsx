@@ -11,6 +11,7 @@ function ItemDesign3({ article = {} as any, onPressItem }: ItemProps) {
     disponibilite = 'disponible',
     prix1 = '¥299',
     image = require('../../../../../assets/images/home/gm4.webp'),
+    titreOriginal = 'Produit Premium',
   } = article || {};
 
   // Valeurs supplémentaires pour le design premium (valeurs par défaut)
@@ -40,7 +41,7 @@ function ItemDesign3({ article = {} as any, onPressItem }: ItemProps) {
             {/* Informations du produit */}
             <View style={styles.infoContainer}>
               <Text style={styles.title} numberOfLines={2}>
-                {titre}
+                {titreOriginal}
               </Text>
 
               <View style={styles.shopInfo}>

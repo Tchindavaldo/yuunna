@@ -15,6 +15,7 @@ function ItemDesign5({
     disponibilite = 'disponible',
     prix1 = '¥199',
     image = require('../../../../../assets/images/home/gm4.webp'),
+    titreOriginal = 'Titre original par défaut',
   } = article || {};
 
   // Déterminer si le produit est disponible

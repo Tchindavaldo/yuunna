@@ -5,6 +5,7 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 // Type pour les articles
 interface Article {
   titre: string;
+  titreOriginal?: string; // Titre original à afficher
   disponibilite: string;
   prix: string;
   prix1?: string; // Pour compatibilité avec le design 5
@@ -25,9 +26,12 @@ function ItemDesign6({
   onPressItem: (index: number) => void;
   continueEffect?: boolean;
 }) {
+  // Filtrer les articles null ou undefined avant de les utiliser
+  const safeArticles = articles.filter(article => article !== null && article !== undefined);
+  
   // Répartition des articles dans les colonnes gauche et droite
   // Si moins de 6 articles, on remplit avec des articles par défaut
-  const filledArticles = [...articles];
+  const filledArticles = [...safeArticles];
   while (filledArticles.length < 6) {
     filledArticles.push({
       titre: `Produit Tendance ${filledArticles.length + 1}`,
@@ -42,12 +46,24 @@ function ItemDesign6({
   // Structure spécifique demandée :
   // Colonne gauche : 2 longs items design 6, 1 petit item design 5
   // Colonne droite : 1 petit item design 5, 2 longs items design 6
-  const leftColumnItems = [filledArticles[0], filledArticles[1]]; // 2 longs items pour la colonne gauche
-  const rightColumnItems = [filledArticles[3], filledArticles[4]]; // 2 longs items pour la colonne droite
+  const leftColumnItems = [filledArticles[0], filledArticles[1]].filter(Boolean); // 2 longs items pour la colonne gauche
+  const rightColumnItems = [filledArticles[3], filledArticles[4]].filter(Boolean); // 2 longs items pour la colonne droite
 
   // Articles pour les petits items design 5
-  const leftSmallItem = filledArticles[2]; // Petit item en bas de la colonne gauche
-  const rightSmallItem = filledArticles[5]; // Petit item en haut de la colonne droite
+  const leftSmallItem = filledArticles[2] || createDefaultItem(2); // Petit item en bas de la colonne gauche
+  const rightSmallItem = filledArticles[5] || createDefaultItem(5); // Petit item en haut de la colonne droite
+  
+  // Fonction pour créer un article par défaut
+  function createDefaultItem(index: number): Article {
+    return {
+      titre: `Produit Tendance ${index + 1}`,
+      disponibilite: 'disponible',
+      prix: `${Math.floor(Math.random() * 100) + 99}€`,
+      vendeur: `Boutique ${index + 1}`,
+      ventes: `${Math.floor(Math.random() * 100) + 50} ventes`,
+      status: 'active',
+    };
+  }
 
   return (
     <View style={[styles.pinterestContainer, continueEffect && styles.continueEffectContainer]}>
@@ -80,7 +96,7 @@ function ItemDesign6({
 
               <View style={styles.infoContainer}>
                 <Text style={styles.title} numberOfLines={1}>
-                  {item.titre}
+                  {item.titreOriginal}
                 </Text>
                 <Text style={styles.price}>{item.prix}</Text>
               </View>
@@ -96,7 +112,7 @@ function ItemDesign6({
           <View style={styles.secondaryImageContainer}>
             <Image
               source={
-                leftSmallItem.imageUrl
+                leftSmallItem?.imageUrl
                   ? { uri: leftSmallItem.imageUrl }
                   : require('../../../../../assets/images/home/gm4.webp')
               }
@@ -108,9 +124,9 @@ function ItemDesign6({
           {/* Informations du produit avec design amélioré */}
           <View style={styles.enhancedInfoContainer}>
             <Text style={styles.enhancedTitle} numberOfLines={1}>
-              {leftSmallItem.titre}
+              {leftSmallItem?.titre || 'Produit'}
             </Text>
-            <Text style={styles.enhancedPrice}>{leftSmallItem.prix}</Text>
+            <Text style={styles.enhancedPrice}>{leftSmallItem?.prix || '0€'}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -125,7 +141,7 @@ function ItemDesign6({
           <View style={styles.secondaryImageContainer}>
             <Image
               source={
-                rightSmallItem.imageUrl
+                rightSmallItem?.imageUrl
                   ? { uri: rightSmallItem.imageUrl }
                   : require('../../../../../assets/images/home/gm4.webp')
               }
@@ -137,9 +153,9 @@ function ItemDesign6({
           {/* Informations du produit avec design amélioré */}
           <View style={styles.enhancedInfoContainer}>
             <Text style={styles.enhancedTitle} numberOfLines={1}>
-              {rightSmallItem.titre}
+              {rightSmallItem?.titre || 'Produit'}
             </Text>
-            <Text style={styles.enhancedPrice}>{rightSmallItem.prix}</Text>
+            <Text style={styles.enhancedPrice}>{rightSmallItem?.prix || '0€'}</Text>
           </View>
         </TouchableOpacity>
 
@@ -171,7 +187,7 @@ function ItemDesign6({
 
               <View style={styles.infoContainer}>
                 <Text style={styles.title} numberOfLines={1}>
-                  {item.titre}
+                  {item.titreOriginal}
                 </Text>
                 <Text style={styles.price}>{item.prix}</Text>
               </View>

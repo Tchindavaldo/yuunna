@@ -3,19 +3,24 @@ import { ApiError, ProductResponse, ProductsResponse } from './models';
 
 // Configuration de base d'Axios
 const API_BASE_URL_PROD = 'https://api.yuunna.coM'; // À remplacer par l'URL de votre API
-const API_BASE_URL_DEV = 'http://192.168.1.198:5000'; // URL de développement avec votre adresse IP locale
+
+// const API_BASE_URL_DEV = 'http://192.168.8.1000:3000'; // URL de développement avec votre adresse IP locale
+const API_BASE_URL_DEV = 'http://192.168.11.21:3000'; // URL de développement avec votre adresse IP locale
+
+// const API_BASE_URL_DEV = 'http://192.168.100.101:5000'; // URL de développement avec votre adresse IP locale
+// const API_BASE_URL_DEV = 'http://192.168.1.124:5001'; // URL de développement avec votre adresse IP locale
+// const API_BASE_URL_DEV = 'http://192.168.1.198:5000'; // URL de développement avec votre adresse IP locale
 
 const API_BASE_URL = API_BASE_URL_DEV; // Utiliser l'URL de développement pour le moment
 // Pour Expo Go, nous devons utiliser l'adresse IP de la machine hôte au lieu de localhost
 
 // IMPORTANT: Pour Expo Go, remplacez 'localhost' par l'adresse IP de votre machine
 // Exemple: Si votre adresse IP est 192.168.1.5, utilisez 'http://192.168.1.5:5000/api/v1'
-// Afficher l'URL complète pour le débogage
-console.log(`[API] Configuration de l'API avec l'URL de base: ${API_BASE_URL_DEV}`);
+// Configuration de l'API avec l'URL de base
 
 const api = axios.create({
   baseURL: API_BASE_URL_DEV, // Pour le développement local
-  timeout: 90000, // Timeout de 30 secondes pour éviter les timeouts
+  timeout: 300000, // Timeout de 30 secondes pour éviter les timeouts
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -49,7 +54,6 @@ api.interceptors.response.use(
     // Vous pouvez ajouter une logique spécifique en fonction du code d'erreur
     if (error.response?.status === 401) {
       // Gérer l'authentification expirée
-      console.error('Session expirée. Veuillez vous reconnecter.');
       // Rediriger vers la page de connexion ou rafraîchir le token
     }
 
@@ -59,51 +63,88 @@ api.interceptors.response.use(
 
 // Service pour les produits
 export const productService = {
-  // Récupérer tous les produits avec pagination
-  getProducts: async (
-    page = 1,
-    limit = 10,
-    options?: { sort?: string; category?: string; search?: string }
-  ): Promise<ProductsResponse> => {
+  // Méthode pour récupérer les produits avec le nouveau système de pagination basé sur un curseur
+  async getTaobaoProducts(
+    cursor: number = 0,
+    limit: number = 10,
+    keyword: string = '',
+    lastDocId?: string
+  ): Promise<ProductsResponse> {
     try {
-      // Construire l'URL avec les paramètres de pagination et de filtrage
-      let url = `/products?page=${page}&limit=${limit}`;
+      // Construire l'URL avec les paramètres de pagination et de recherche
+      let url = `/taobao-products?cursor=${cursor}&limit=${limit}`;
 
-      // Ajouter les paramètres optionnels s'ils sont fournis
-      if (options) {
-        if (options.sort) url += `&sort=${options.sort}`;
-        if (options.category) url += `&category=${options.category}`;
-        if (options.search) url += `&search=${encodeURIComponent(options.search)}`;
+      // Ajouter le mot-clé de recherche s'il est présent
+      if (keyword) {
+        url += `&keyword=${keyword}`;
       }
 
-      // Afficher l'URL complète pour le débogage
+      // Ajouter le lastDocId s'il est présent pour la pagination Firestore
+      if (lastDocId) {
+        url += `&lastDocId=${lastDocId}`;
+      }
+
       const fullUrl = `${API_BASE_URL_DEV}${url}`;
-      console.log(`[API] Appel au backend réel - URL complète: ${fullUrl}`);
-      console.log(`[API] Appel au backend réel - Page: ${page}, Limit: ${limit}, Options:`, options);
+      // console.log(`[API] Appel à l'API Taobao avec l'URL: ${fullUrl}`);
 
       const response = await api.get<ProductsResponse>(url);
-      console.log(`[API] Réponse du backend - ${response.data.items.length} produits reçus`);
-      return response.data;
-    } catch (error: any) {
-      // Afficher plus de détails sur l'erreur pour le débogage
-      console.error('[API] Erreur lors de la récupération des produits:', error);
 
-      if (error.response) {
-        // La requête a été faite et le serveur a répondu avec un code d'erreur
-        console.error('[API] Données de réponse:', error.response.data);
-        console.error('[API] Statut:', error.response.status);
-        console.error('[API] En-têtes:', error.response.headers);
-      } else if (error.request) {
-        // La requête a été faite mais aucune réponse n'a été reçue
-        console.error('[API] Aucune réponse reçue:', error.request);
-      } else {
-        // Une erreur s'est produite lors de la configuration de la requête
-        console.error('[API] Erreur de configuration:', error.message);
+      // Vérifier si items existe dans la réponse
+      if (!response.data.items) {
+        // Créer un objet items vide pour éviter les erreurs
+        response.data.items = [];
       }
 
+      // Log des données reçues pour le débogage
+      console.log(
+        `[API] Reçu ${response.data.items.length} produits, lastDoc: ${response.data.lastDoc || 'non défini'}`
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error('[API] Erreur lors de la récupération des produits Taobao:', error);
+      throw error;
+    }
+  },
+
+  // Récupérer tous les produits avec pagination
+  getProducts: async (cursor = 0, limit = 10, keyword = '', lastDocId?: string): Promise<ProductsResponse> => {
+    try {
+      // Construire l'URL avec les paramètres de pagination et de filtrage
+      // Garder l'URL existante mais utiliser les nouveaux paramètres
+      let url = `/products?cursor=${cursor}&limit=${limit}`;
+
+      // Ajouter le mot-clé de recherche s'il est présent
+      if (keyword) {
+        url += `&search=${keyword}`;
+      }
+
+      // Ajouter le lastDocId s'il est présent pour la pagination Firestore
+      if (lastDocId) {
+        url += `&lastDocId=${lastDocId}`;
+      }
+
+      const fullUrl = `${API_BASE_URL_DEV}${url}`;
+
+      // console.log(`[API] Appel à l'API avec l'URL: ${fullUrl}`);
+      const response = await api.get<ProductsResponse>(url);
+
+      // S'assurer que les métadonnées de pagination sont complètes
+      // Si le backend ne renvoie pas certaines informations, les ajouter manuellement
+      if (response.data.cursor === undefined) {
+        response.data.cursor = cursor;
+      }
+
+      // Log des données reçues pour le débogage
+      // console.log(
+      //   `[API] Reçu ${response.data.items.length} produits, lastDoc: ${response.data.lastDoc || 'non défini'}`
+      // );
+
+      return response.data;
+    } catch (error: any) {
+      console.error('[API] Erreur lors de la récupération des produits:', error);
       // Réessayer avec les données mockées en cas d'erreur
-      console.log('[API] Utilisation des données mockées comme fallback...');
-      return productService.getMockProducts(page, limit, options);
+      return productService.getMockProducts(cursor, limit, { search: keyword });
     }
   },
 
@@ -119,9 +160,11 @@ export const productService = {
   },
 
   // Récupérer les produits par catégorie
-  getProductsByCategory: async (category: string, page = 1, limit = 10): Promise<ProductsResponse> => {
+  getProductsByCategory: async (category: string, cursor = 0, limit = 10): Promise<ProductsResponse> => {
     try {
-      const response = await api.get<ProductsResponse>(`/products/category/${category}?page=${page}&limit=${limit}`);
+      const response = await api.get<ProductsResponse>(
+        `/products/category/${category}?cursor=${cursor}&limit=${limit}`
+      );
       return response.data;
     } catch (error) {
       console.error(`Erreur lors de la récupération des produits de la catégorie ${category}:`, error);
@@ -130,9 +173,9 @@ export const productService = {
   },
 
   // Rechercher des produits
-  searchProducts: async (query: string, page = 1, limit = 10): Promise<ProductsResponse> => {
+  searchProducts: async (query: string, cursor = 0, limit = 10): Promise<ProductsResponse> => {
     try {
-      const response = await api.get<ProductsResponse>(`/products/search?q=${query}&page=${page}&limit=${limit}`);
+      const response = await api.get<ProductsResponse>(`/products/search?q=${query}&cursor=${cursor}&limit=${limit}`);
       return response.data;
     } catch (error) {
       console.error(`Erreur lors de la recherche de produits avec la requête ${query}:`, error);
@@ -182,99 +225,109 @@ export const productService = {
     // Générer des données factices basées sur la structure réelle du backend
     const items = Array.from({ length: limit }, (_, i) => {
       const index = pageStartIndex + i;
+      const id = `product-${index + 1}`;
       const categoryIndex = index % categories.length;
       const subCategoryIndex = index % subCategories.length;
       const imageIndex = index % images.length;
-      const isDiscounted = Math.random() > 0.7;
-      const originalPrice = (Math.random() * 200 + 50).toFixed(1);
-      const discountPercent = isDiscounted ? Math.floor(Math.random() * 30 + 10) : 0;
-      const finalPrice = isDiscounted
-        ? (parseFloat(originalPrice) * (1 - discountPercent / 100)).toFixed(1)
-        : originalPrice;
+
+      // Générer un prix aléatoire entre 50 et 500
+      const price = Math.floor(Math.random() * 450) + 50;
+      // Générer un nombre de ventes aléatoire
+      const sales = Math.floor(Math.random() * 1000);
 
       return {
-        // Attributs actuels du backend
-        id: `Q80rmveXxFtdVeptR4Z${index + 1}`,
-        titre: `Produit ${index + 1} - 领带白色长袖衬衫男宽松情侣套装`,
-        prix: `¥${finalPrice}`,
+        id,
+        titre: `Produit ${index + 1} - ${subCategories[subCategoryIndex]} tendance`,
+        titreOriginal: `Original Product ${index + 1} - Trendy ${subCategories[subCategoryIndex]}`,
+        prix: `¥${price}`,
         imageUrl: images[imageIndex],
-        lien: `https://item.taobao.com/item.htm?id=62804669${index + 1000}`,
-        vendeur: '男的国',
-        localisation: '广东 / 潮州',
-        ventes: `${Math.floor(Math.random() * 100)}人付款`,
-        categoryId: `${categories[categoryIndex].id} / ${subCategories[subCategoryIndex]}`,
+        vendeur: `Boutique ${Math.floor(index / 5) + 1}`,
+        localisation: 'Chine',
+        ventes: `${sales} ventes`,
+        categoryId: categories[categoryIndex].id,
         subCategoryId: subCategories[subCategoryIndex],
-        mainCategory: categories[categoryIndex].id,
+        mainCategory: categories[categoryIndex].name,
         subCategory: subCategories[subCategoryIndex],
-        titreOriginal: '领带白色长袖衬衫男宽松情侣套装港风学生班服休闲学院风衬衣秋季',
-        titreTraduit: '领带白色长袖chemisehomme宽松情侣套装港风学生班服休闲学院风衬衣秋季',
-        searchKeyword: '衬衫',
-        status: Math.random() > 0.1 ? 'active' : 'inactive',
-        createdAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 24 * 60 * 60 * 1000).toISOString(),
-        source: 'taobao',
-
-        // Attributs utiles pour l'interface utilisateur et les fonctionnalités futures
-        description: `Description détaillée du produit ${index + 1}. Ce produit est de haute qualité et offre d'excellentes performances. Fabriqué avec des matériaux durables et un design élégant.`,
-        rating: parseFloat((Math.random() * 2 + 3).toFixed(1)), // Note entre 3 et 5
-        stock: Math.floor(Math.random() * 50),
-        discount: isDiscounted ? discountPercent : undefined,
-        originalPrice: isDiscounted ? `¥${originalPrice}` : undefined,
-        colors: ['rouge', 'bleu', 'noir', 'blanc'].slice(0, Math.floor(Math.random() * 4) + 1),
-        sizes: ['S', 'M', 'L', 'XL'].slice(0, Math.floor(Math.random() * 4) + 1),
-        isFavorite: Math.random() > 0.8,
-        isInCart: Math.random() > 0.9,
-        cartQuantity: Math.random() > 0.9 ? Math.floor(Math.random() * 3) + 1 : undefined,
-        tags: ['tendance', 'nouveau', 'promotion'].filter(() => Math.random() > 0.6),
-        relatedProducts: Array.from(
-          { length: 3 },
-          (_, j) => `Q80rmveXxFtdVeptR4Z${Math.floor(Math.random() * 100) + 1}`
-        ),
-        shipping: {
-          cost: Math.random() > 0.3 ? `¥${(Math.random() * 20 + 5).toFixed(1)}` : '0',
-          estimatedDelivery: `${Math.floor(Math.random() * 10) + 3}-${Math.floor(Math.random() * 10) + 10} jours`,
-          freeShipping: Math.random() > 0.7,
-        },
+        status: index % 10 === 0 ? 'out_of_stock' : 'active', // Simuler quelques produits en rupture de stock
       };
     });
 
-    // Calculer le nombre total de produits disponibles (pour la simulation)
-    const totalItems = 100;
+    // Simuler une recherche si un terme est fourni
+    let filteredItems = items;
+    if (options?.search) {
+      const searchTerm = options.search.toLowerCase();
+      filteredItems = items.filter(
+        item =>
+          item.titre.toLowerCase().includes(searchTerm) ||
+          item.mainCategory.toLowerCase().includes(searchTerm) ||
+          item.subCategory.toLowerCase().includes(searchTerm)
+      );
+    }
 
-    // Vérifier si nous avons atteint la fin des données
-    const hasMore = pageStartIndex + limit < totalItems;
+    // Simuler un filtrage par catégorie si une catégorie est fournie
+    if (options?.category) {
+      filteredItems = filteredItems.filter(item => item.categoryId === options.category);
+    }
 
-    // Calculer les informations de pagination pour les logs
-    const itemsStart = pageStartIndex + 1;
-    const itemsEnd = Math.min(pageStartIndex + limit, totalItems);
-    console.log(
-      `[API] Renvoi des produits ${itemsStart}-${itemsEnd}/${totalItems} (Page ${page}, hasMore: ${hasMore})`
-    );
+    // Simuler un tri si demandé
+    if (options?.sort) {
+      switch (options.sort) {
+        case 'price_asc':
+          filteredItems.sort((a, b) => {
+            const priceA = parseInt(a.prix.replace('¥', ''));
+            const priceB = parseInt(b.prix.replace('¥', ''));
+            return priceA - priceB;
+          });
+          break;
+        case 'price_desc':
+          filteredItems.sort((a, b) => {
+            const priceA = parseInt(a.prix.replace('¥', ''));
+            const priceB = parseInt(b.prix.replace('¥', ''));
+            return priceB - priceA;
+          });
+          break;
+        case 'popularity':
+          filteredItems.sort((a, b) => {
+            const salesA = parseInt(a.ventes.split(' ')[0]);
+            const salesB = parseInt(b.ventes.split(' ')[0]);
+            return salesB - salesA;
+          });
+          break;
+        default:
+          // Par défaut, pas de tri spécifique
+          break;
+      }
+    }
 
-    // Créer une réponse enrichie
-    return {
-      items,
+    // Calculer s'il y a plus de pages
+    const totalItems = filteredItems.length;
+    const hasMorePages = pageStartIndex + limit < totalItems;
+
+    // Créer la structure de réponse complète
+    const response: ProductsResponse = {
+      success: true,
+      items: filteredItems.slice(0, limit), // Limiter les résultats à la taille de la page
+      pagination: {
+        cursor: pageStartIndex,
+        nextCursor: hasMorePages ? pageStartIndex + limit : pageStartIndex, // Toujours un nombre, même s'il n'y a plus de pages
+        limit,
+        hasMore: hasMorePages,
+        totalAvailable: totalItems,
+      },
+      cursor: pageStartIndex,
+      nextCursor: hasMorePages ? pageStartIndex + limit : undefined,
+      hasMore: hasMorePages,
       total: totalItems,
       page,
       limit,
-      hasMore,
-      nextCursor: hasMore ? `cursor_${page + 1}` : undefined,
-      prevCursor: page > 1 ? `cursor_${page - 1}` : undefined,
-      lastUpdated: new Date().toISOString(),
-      filters: options
-        ? {
-            category: options.category,
-            priceRange: { min: 10, max: 200 },
-            sortBy: options.sort || 'popularity',
-            searchQuery: options.search || '',
-          }
-        : {
-            category: undefined,
-            priceRange: { min: 10, max: 200 },
-            sortBy: 'popularity',
-            searchQuery: '',
-          },
       categories,
+      lastUpdated: new Date().toISOString(),
+      lastDoc: hasMorePages ? `mock_doc_${pageStartIndex + limit - 1}` : undefined, // Simuler un ID de document Firestore
+      message:
+        filteredItems.length > 0 ? `${Math.min(filteredItems.length, limit)} produits trouvés` : 'Aucun produit trouvé',
     };
+
+    return response;
   },
 };
 

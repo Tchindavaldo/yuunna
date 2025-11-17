@@ -14,8 +14,8 @@ import {
   View,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
-import { fetchProducts } from '../../../store/productSlice';
-import { Product } from '../../../store/types';
+import { fetchProducts, setHasMore } from '../../../store/productSlice';
+import { Product, productGroup } from '../../../store/types';
 import BottomNav from '../../gloabal/bottom-nav';
 import ItemDesign1 from './design/design1/item-design-1';
 import ItemDesign2 from './design/design2/item-design-2';
@@ -24,9 +24,23 @@ import ItemDesign6 from './design/design6/item-design-6';
 import Header from './header/header';
 import { useNavigateWithData } from './utils/navigate';
 
-const PAGE_SIZE = 10;
+// Calcul du nombre optimal de produits à charger :
+// - Chaque item principal utilise 1 produit
+// - Design 1 utilise 2 produits supplémentaires
+// - Design 2 utilise 3 produits supplémentaires
+// - Design 4 utilise 4 produits supplémentaires
+// Total par item: 1 + 2 + 3 + 4 = 10 produits
+// Pour avoir au moins 2 items complets visibles à l'écran: 2 * 10 = 20
+const PAGE_SIZE = 18; // Optimisé pour charger suffisamment de produits pour les designs
 
 const { height, width } = Dimensions.get('window');
+
+// Fonction utilitaire pour formater les prix (convertir les nombres en chaînes si nécessaire)
+const formatPrice = (price: string | number | undefined): string => {
+  if (price === undefined) return '0';
+  if (typeof price === 'number') return `¥${price}`;
+  return price;
+};
 
 const styles = StyleSheet.create({
   flatListContainer: {
@@ -313,24 +327,75 @@ const styles = StyleSheet.create({
 });
 
 export default function HomeComponent() {
+  // Hooks et state
   const navigateWithData = useNavigateWithData();
   const dispatch = useAppDispatch();
-  const { items: data, loading, page, hasMore } = useAppSelector(state => state.products);
+
+  // Récupérer les données du store Redux avec vérification de sécurité
+  const productsState = useAppSelector(state => state.products);
+  const { loading, page, hasMore } = productsState;
+
+  // S'assurer que items est toujours un tableau, même s'il est null ou undefined
+  const items = productsState?.items || [];
+  const data = items;
   const [loaderType, setLoaderType] = useState<'default' | 'pulse' | 'dots' | 'progress' | 'skeleton'>('pulse');
   const [isInitialLoadDone, setIsInitialLoadDone] = useState(false); // Flag pour éviter les appels multiples
 
   // Variables pour le carrousel des produits populaires
-  const defaultItem: Product =
-    data.length > 0 ? data[0] : { id: '0', titre: '', status: '', prix: '0', imageUrl: '', vendeur: '', ventes: '0' };
-  const design1Products = data.length > 1 ? data.slice(1, 3) : [];
+  // const defaultItem: productGroup =
+  // data.length > 0 ? data[0] : {id:'id1',[{ id: '0', titre: '', status: '', prix: '0', imageUrl: '', vendeur: '', ventes: '0' }]};
+  const defaultItem: productGroup =
+    data.length > 0
+      ? data[0]
+      : {
+          id: 'default-group',
+          products: [
+            {
+              id: '0',
+              titre: '',
+              status: '',
+              prix: '0',
+              imageUrl: '',
+              vendeur: '',
+              ventes: '0',
+            },
+          ],
+        };
+
+  // Vérifier que defaultItem.products[0] existe
+  console.log(defaultItem);
+
+  const defaultProduct =
+    defaultItem.products && defaultItem.products.length > 0
+      ? defaultItem.products[0]
+      : {
+          id: '0',
+          titre: 'Produit par défaut',
+          status: 'active',
+          prix: '0',
+          imageUrl: '',
+          vendeur: 'Boutique par défaut',
+          ventes: '0 ventes',
+        };
+
   const article = {
-    titre: defaultItem.titre,
-    disponibilite: defaultItem.status === 'active' ? 'disponible' : 'indisponible',
-    prix1: defaultItem.prix,
-    image: defaultItem.imageUrl ? { uri: defaultItem.imageUrl } : undefined,
-    vendeur: defaultItem.vendeur,
-    ventes: defaultItem.ventes,
+    titre: 'Produit par défaut',
+    titreOriginal: 'Produit par défaut',
+    disponibilite: 'indisponible',
+    prix1: '0',
+    image: undefined,
+    vendeur: 'Boutique par défaut',
+    ventes: '0 ventes',
   };
+  // const article = {
+  //   titre: defaultProduct.titre || 'Produit par défaut',
+  //   titreOriginal: defaultProduct.titreOriginal || defaultProduct.titre || 'Produit par défaut',
+  //   disponibilite: defaultProduct.status === 'active' ? 'disponible' : 'indisponible',
+  //   prix1: formatPrice(defaultProduct.prix || '0'),
+  //   image: defaultProduct.imageUrl ? { uri: defaultProduct.imageUrl } : undefined,
+  //   vendeur: defaultProduct.vendeur || 'Boutique par défaut',
+  //   ventes: defaultProduct.ventes || '0 ventes',
+  // };
 
   // Animations
   const pulseAnim = React.useRef(new Animated.Value(1)).current;
@@ -341,43 +406,106 @@ export default function HomeComponent() {
   const loadInitialData = useCallback(async () => {
     // Vérifier si les données sont déjà chargées ou en cours de chargement
     if (loading || data.length > 0 || isInitialLoadDone) {
-      console.log(
-        '[HOME] Chargement initial ignoré:',
-        loading ? 'chargement en cours' : data.length > 0 ? 'données déjà chargées' : 'déjà fait'
-      );
+      // console.log(
+      // //   '[HOME] Chargement initial ignoré:',
+      //   loading ? 'chargement en cours' : data.length > 0 ? 'données déjà chargées' : 'déjà fait'
+      // );
       return;
     }
 
     try {
-      console.log('[HOME] Démarrage du chargement initial (page 1)');
-      // Réinitialiser la page à 1 et charger les données initiales
-      await dispatch(fetchProducts({ page: 1, limit: PAGE_SIZE }));
-      console.log('[HOME] Chargement initial terminé avec succès');
+      // Démarrage du chargement initial (cursor 0)
+      // Réinitialiser le curseur à 0 et charger les données initiales
+      await dispatch(
+        fetchProducts({
+          cursor: 0,
+          limit: PAGE_SIZE,
+          // keyword: '美国T恤', // Mot-clé par défaut, à remplacer par un état si nécessaire
+        })
+      );
+      // Chargement initial terminé avec succès
     } catch (error) {
       console.error('[HOME] Erreur lors du chargement initial des produits:', error);
     }
   }, [dispatch, loading, data.length, isInitialLoadDone]);
 
   // Fonction pour charger plus de données (pagination)
+  // Récupérer les données de pagination depuis le store Redux
+  const { nextCursor, cursor, totalAvailable, hasMore: storeHasMore, lastDoc } = useAppSelector(state => state.products);
+
+  // Log pour déboguer l'état de la pagination
+  useEffect(() => {
+    // // console.log(
+    //   `[HOME] État de la pagination: cursor=${cursor}, nextCursor=${nextCursor}, hasMore=${hasMore}, storeHasMore=${storeHasMore}, totalAvailable=${totalAvailable}`
+    // );
+  }, [cursor, nextCursor, hasMore, storeHasMore, totalAvailable]);
+
   const fetchMoreData = useCallback(async () => {
-    // Vérifier si un chargement est déjà en cours ou s'il n'y a plus de données
-    if (loading || !hasMore) {
-      console.log('[HOME] Pas de chargement supplémentaire:', loading ? 'chargement en cours' : 'plus de données');
+    // Vérifier si un chargement est déjà en cours
+    if (loading) {
+      // console.log('[HOME] Pas de chargement supplémentaire: chargement en cours');
       return;
     }
 
-    try {
-      // Utiliser la page actuelle + 1 pour charger la page suivante
-      const nextPage = page + 1;
-      console.log(`[HOME] Démarrage du chargement de la page ${nextPage} (${data.length} produits déjà chargés)`);
+    // Vérifier s'il y a plus de données à charger
+    // Utiliser storeHasMore qui vient directement du store Redux
+    if (storeHasMore === false) {
+      // console.log('[HOME] Pas de chargement supplémentaire: plus de données (storeHasMore est false)');
+      return;
+    }
 
-      // Charger la page suivante
-      await dispatch(fetchProducts({ page: nextPage, limit: PAGE_SIZE }));
-      console.log(`[HOME] Chargement de la page ${nextPage} terminé avec succès`);
+    // Log pour déboguer
+    // console.log(`[HOME] fetchMoreData - cursor: ${cursor}, nextCursor: ${nextCursor}, storeHasMore: ${storeHasMore}`);
+
+    // Vérifier si on a déjà chargé tous les produits disponibles
+    // Note: Nous continuons à charger même si totalAvailable est atteint, car le backend peut avoir plus de données
+    if (data.length >= totalAvailable && totalAvailable > 0) {
+      // console.log(
+      // //   `[HOME] Tous les produits disponibles (${totalAvailable}) ont été chargés, mais on continue à chercher plus`
+      // );
+      // // Ne pas arrêter le chargement ici, continuer à essayer de charger plus de données
+      // dispatch(setHasMore(false)); // Cette ligne est commentée pour permettre plus de chargements
+    }
+
+    try {
+      // Déterminer le curseur à utiliser pour la prochaine requête
+      // Si nextCursor est défini, l'utiliser
+      // Sinon, si cursor est défini, utiliser cursor + PAGE_SIZE
+      // Sinon, utiliser data.length comme curseur (position actuelle dans la liste)
+      let cursorToUse;
+
+      if (nextCursor !== undefined && nextCursor !== null) {
+        cursorToUse = nextCursor;
+      } else if (cursor !== undefined && cursor !== null) {
+        cursorToUse = cursor + PAGE_SIZE;
+      } else {
+        cursorToUse = data.length;
+      }
+
+      // Démarrage du chargement avec cursor et lastDoc
+      // Charger la page suivante avec le système de curseur et lastDoc
+      const result = await dispatch(
+        fetchProducts({
+          cursor: cursorToUse,
+          limit: PAGE_SIZE,
+          // Le mot-clé a été retiré pour simplifier la requête
+          // Le lastDoc est automatiquement récupéré depuis le state dans le thunk
+        })
+      );
+
+      // Vérifier si des données ont été reçues
+      const payload = result.payload as any;
+      if (payload && payload.items && payload.items.length === 0) {
+        // console.log('[HOME] Aucun produit reçu, fin du chargement');
+        // Forcer hasMore à false dans le store
+        dispatch(setHasMore(false));
+      } else {
+        // Chargement avec cursor terminé avec succès
+      }
     } catch (error) {
       console.error('[HOME] Erreur lors du chargement des produits supplémentaires:', error);
     }
-  }, [dispatch, loading, hasMore, page, data.length]);
+  }, [dispatch, loading, storeHasMore, data.length, nextCursor, cursor, totalAvailable]);
 
   useEffect(() => {
     if (loading) {
@@ -421,17 +549,18 @@ export default function HomeComponent() {
 
   // Effet pour charger les données initiales une seule fois au montage du composant
   useEffect(() => {
-    console.log('[HOME] Initialisation du composant Home - État actuel:', {
-      dataLength: data.length,
-      loading,
-      isInitialLoadDone,
-      page,
-      hasMore,
-    });
+    // Afficher l'état actuel avec le nombre réel d'éléments dans le tableau data
+    // console.log('[HOME] Initialisation du composant Home - État actuel:', {
+    //   dataLength: data.length,
+    //   loading,
+    //   isInitialLoadDone,
+    //   page,
+    //   hasMore,
+    // });
 
     // Vérifier si les données sont déjà chargées ou en cours de chargement
     if (data.length === 0 && !loading && !isInitialLoadDone) {
-      console.log('[HOME] Démarrage du chargement initial depuis useEffect');
+      // Démarrage du chargement initial depuis useEffect
       setIsInitialLoadDone(true); // Marquer comme fait pour éviter les appels répétés
       loadInitialData();
     }
@@ -442,9 +571,25 @@ export default function HomeComponent() {
 
   // Mémoiser la fonction onPressItem pour éviter les recréations à chaque rendu
   const createOnPressItem = useCallback(
-    (item: Product) => {
+    (item: Product | null | undefined) => {
       return () => {
-        navigateWithData(Routes.tabs.home.detail, { product: item });
+        // Vérifier que l'item existe avant de naviguer
+        if (item) {
+          navigateWithData(Routes.tabs.home.detail, { product: item });
+        } else {
+          console.warn('[HOME] Tentative de navigation avec un produit null ou undefined');
+          // Créer un produit par défaut pour éviter les erreurs
+          const defaultProduct = {
+            id: 'default-product',
+            titre: 'Produit par défaut',
+            prix: '0',
+            imageUrl: '',
+            vendeur: 'Boutique par défaut',
+            ventes: '0 ventes',
+            status: 'active',
+          };
+          navigateWithData(Routes.tabs.home.detail, { product: defaultProduct });
+        }
       };
     },
     [navigateWithData]
@@ -467,14 +612,42 @@ export default function HomeComponent() {
       const baseHash = getStableHash(baseProduct.id);
       const result = [];
 
+      // Vérifier si nous avons assez de produits dans data
+      if (data.length < 2) {
+        // Si nous n'avons pas assez de produits, retourner un tableau avec le produit de base répété
+        // console.log(
+        // //   `[HOME] Pas assez de produits disponibles (${data.length}), utilisation du produit de base pour tous les designs`
+        // );
+        return Array(count).fill(baseProduct);
+      }
+
+      // Log pour déboguer
+      // Produits disponibles pour getNextProducts
+
       // Créer un tableau d'indices stables basés sur le hash du produit
+      // Utiliser modulo data.length pour s'assurer que nous ne dépassons pas la taille du tableau
       const stableIndices = Array.from({ length: count }, (_, i) => {
         return (baseHash + i + 1) % data.length;
       });
 
       // Récupérer les produits aux indices calculés
       for (const idx of stableIndices) {
-        result.push(data[idx]);
+        if (idx >= 0 && idx < data.length) {
+          result.push(data[idx]);
+        } else {
+          // Si l'indice est hors limites, utiliser le produit de base comme fallback
+          result.push(baseProduct);
+        }
+      }
+
+      // Vérifier si nous avons récupéré assez de produits
+      if (result.length < count) {
+        // Compléter avec des copies du produit de base si nécessaire
+        const remaining = count - result.length;
+        // console.log(
+        // //   `[HOME] Pas assez de produits récupérés (${result.length}/${count}), ajout de ${remaining} copies du produit de base`
+        // );
+        result.push(...Array(remaining).fill(baseProduct));
       }
 
       return result;
@@ -483,31 +656,47 @@ export default function HomeComponent() {
   );
 
   // Fonction pour déterminer si un produit doit être affiché comme premium
-  const isPremiumProduct = useCallback((product: Product) => {
+  const isPremiumProduct = useCallback((product: Product | null) => {
+    // Vérifier si le produit est null ou undefined
+    if (!product) return false;
+
     // Logique pour déterminer si un produit est premium
     // Par exemple, basé sur le prix, la catégorie, etc.
-    return product.prix && parseFloat(product.prix.replace(/[^0-9.]/g, '')) > 50;
+    if (!product.prix) return false;
+
+    // Gérer à la fois les prix sous forme de chaîne et de nombre
+    let prixValue: number;
+    if (typeof product.prix === 'number') {
+      prixValue = product.prix;
+    } else {
+      // Si c'est une chaîne, extraire la valeur numérique
+      prixValue = parseFloat(product.prix.replace(/[^0-9.]/g, ''));
+    }
+
+    return prixValue > 50;
   }, []);
 
   // Mémoiser la fonction renderItem pour éviter les recréations à chaque rendu
   const renderItem = useCallback(
-    ({ item, index }: { item: Product; index: number }) => {
-      // Récupérer des produits supplémentaires pour les designs
-      const design1Products = getNextProducts(item, 2);
-      const design2Products = getNextProducts(item, 3);
-      const design4Products = getNextProducts(item, 4); // Produits pour le design Pinterest/Taobao
-      const design5Products = getNextProducts(item, 3); // Produits pour le design 5
-      const design6Products = getNextProducts(item, 2); // Produits pour le design 6
+    ({ item, index }: { item: productGroup; index: number }) => {
+      // Le backend renvoie maintenant directement un tableau de 6 items
+      // Vérifier si item est un tableau ou un objet unique
+      // Traitement de l'item
 
-      // Adapter le format du produit pour correspondre à l'interface ItemProps
-      const article = {
-        titre: item.titre,
-        disponibilite: item.status === 'active' ? 'disponible' : 'indisponible',
-        prix1: item.prix,
-        image: item.imageUrl ? { uri: item.imageUrl } : undefined,
-        vendeur: item.vendeur,
-        ventes: item.ventes,
-      };
+      // Vérifier si item est null ou undefined avant de traiter ses propriétés
+      if (!item || !item.products) {
+        return null; // Ne pas rendre cet élément s'il est null ou si ses produits sont null
+      }
+
+      const itemArray = Array.isArray(item.products) ? item.products : [item.products];
+
+      // Filtrer les produits null ou undefined
+      const validProducts = itemArray.filter(product => product !== null && product !== undefined);
+
+      // Utiliser les produits valides pour les designs
+      const design2Products = validProducts.slice(0, 6);
+      const design4Products = validProducts.slice(6, 12);
+      const design3Products = validProducts.slice(12);
 
       return (
         <View>
@@ -521,77 +710,30 @@ export default function HomeComponent() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ gap: 15, paddingHorizontal: 0 }}
               removeClippedSubviews={true}>
-              {design2Products.map((product, idx) => {
-                const productArticle = {
-                  titre: product.titre,
-                  disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
-                  prix1: product.prix,
-                  image: product.imageUrl ? { uri: product.imageUrl } : undefined,
-                  vendeur: product.vendeur,
-                  ventes: product.ventes,
-                };
+              {design2Products
+                .filter(product => product !== null && product !== undefined)
+                .map((product, idx) => {
+                  const productArticle = {
+                    titre: product.titre || `Produit ${idx + 1}`,
+                    titreOriginal: product.titreOriginal || product.titre || `Produit ${idx + 1}`,
+                    disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+                    prix1: formatPrice(product.prix || '0'),
+                    image: product.imageUrl ? { uri: product.imageUrl } : undefined,
+                    vendeur: product.vendeur || `Boutique ${idx + 1}`,
+                    ventes: product.ventes || `${Math.floor(Math.random() * 100) + 50} ventes`,
+                  };
 
-                return (
-                  <ItemDesign2
-                    article={productArticle}
-                    onPressItem={createOnPressItem(product)}
-                    key={`${product.id}_design2_${idx}`}
-                  />
-                );
-              })}
+                  return (
+                    <ItemDesign2
+                      article={productArticle}
+                      onPressItem={createOnPressItem(product)}
+                      key={`${product.id}_design2_${idx}`}
+                    />
+                  );
+                })}
             </ScrollView>
           </View>
 
-          {/* Section 5: Design 5 - Pinterest/Taobao Inversé */}
-          {/* <View style={styles.sectionContainer}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Collection Exclusive</Text>
-              <Text style={styles.sectionSubtitle}>Sélection spéciale</Text>
-            </View>
-
-            <View style={styles.pinterestOuterContainer}>
-
-               <View style={styles.pinterestSingleContainer}>
-                {design4Products.length > 0 && (
-                  <ItemDesign5
-                    article={{
-                      titre: design4Products[0].titre,
-                      disponibilite: design4Products[0].status === 'active' ? 'disponible' : 'indisponible',
-                      prix1: design4Products[0].prix,
-                      image: design4Products[0].imageUrl ? { uri: design4Products[0].imageUrl } : undefined,
-                      vendeur: design4Products[0].vendeur || 'Boutique Premium',
-                      ventes: `${Math.floor(Math.random() * 300) + 50} ventes`,
-                    }}
-                    onPressItem={createOnPressItem(design4Products[0])}
-                    secondItem={
-                      design4Products.length > 1
-                        ? {
-                            titre: design4Products[1].titre,
-                            disponibilite: design4Products[1].status === 'active' ? 'disponible' : 'indisponible',
-                            prix1: design4Products[1].prix,
-                            image: design4Products[1].imageUrl ? { uri: design4Products[1].imageUrl } : undefined,
-                            vendeur: design4Products[1].vendeur || 'Boutique Exclusive',
-                            ventes: `${Math.floor(Math.random() * 180) + 20} ventes`,
-                          }
-                        : undefined
-                    }
-                    thirdItem={
-                      design4Products.length > 2
-                        ? {
-                            titre: design4Products[2].titre,
-                            disponibilite: design4Products[2].status === 'active' ? 'disponible' : 'indisponible',
-                            prix1: design4Products[2].prix,
-                            image: design4Products[2].imageUrl ? { uri: design4Products[2].imageUrl } : undefined,
-                            vendeur: design4Products[2].vendeur || 'Boutique Luxe',
-                            ventes: `${Math.floor(Math.random() * 150) + 15} ventes`,
-                          }
-                        : undefined
-                    }
-                  />
-                )}
-              </View>
-            </View>
-          </View>*/}
           {/* Section 6: Design 6 - Deux éléments égaux côte à côte */}
           <View style={styles.sectionContainer && styles.desing6}>
             <View style={styles.sectionHeader}>
@@ -603,16 +745,25 @@ export default function HomeComponent() {
               {/* Affichage du composant ItemDesign6 avec 2 éléments de taille égale */}
               <View style={styles.pinterestSingleContainer}>
                 <ItemDesign6
-                  articles={design4Products.map((product, idx) => ({
-                    titre: product.titre,
-                    disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
-                    prix: product.prix,
-                    imageUrl: product.imageUrl,
-                    vendeur: product.vendeur || `Boutique Premium ${idx + 1}`,
-                    ventes: `${Math.floor(Math.random() * (300 - idx * 50)) + (50 - idx * 10)} ventes`,
-                    status: product.status,
-                  }))}
-                  onPressItem={index => createOnPressItem(design4Products[index])()}
+                  articles={design4Products
+                    .filter(product => product !== null && product !== undefined)
+                    .map((product, idx) => ({
+                      titre: product.titre || `Produit ${idx + 1}`,
+                      titreOriginal: product.titreOriginal || product.titre || `Produit ${idx + 1}`,
+                      disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
+                      prix: formatPrice(product.prix || '0'),
+                      imageUrl: product.imageUrl || '',
+                      vendeur: product.vendeur || `Boutique Premium ${idx + 1}`,
+                      ventes:
+                        product.ventes || `${Math.floor(Math.random() * (300 - idx * 50)) + (50 - idx * 10)} ventes`,
+                      status: product.status || 'active',
+                    }))}
+                  onPressItem={index => {
+                    const validProducts = design4Products.filter(product => product !== null);
+                    if (index >= 0 && index < validProducts.length) {
+                      createOnPressItem(validProducts[index])();
+                    }
+                  }}
                 />
               </View>
             </View>
@@ -629,14 +780,15 @@ export default function HomeComponent() {
               contentContainerStyle={{ gap: 15, paddingHorizontal: 0 }}
               removeClippedSubviews={true}>
               {/* Produits premium */}
-              {data
-                .slice(0, 4)
+              {design3Products
+                .filter(product => product !== null && product !== undefined) // Filtrer les produits null ou undefined
                 .map((product, idx) => {
                   if (isPremiumProduct(product)) {
                     const productArticle = {
-                      titre: product.titre,
+                      titre: product.titre || `Produit Premium ${idx + 1}`,
+                      titreOriginal: product.titreOriginal || product.titre || `Produit Premium ${idx + 1}`,
                       disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
-                      prix1: product.prix,
+                      prix1: formatPrice(product.prix || '0'),
                       image: product.imageUrl ? { uri: product.imageUrl } : undefined,
                       vendeur: product.vendeur || 'Boutique Officielle',
                       ventes: product.ventes || '256 ventes',
@@ -660,9 +812,10 @@ export default function HomeComponent() {
                   titre: 'Produit Premium Exclusif',
                   disponibilite: 'disponible',
                   prix1: '¥399',
-                  image: data[0].imageUrl ? { uri: data[0].imageUrl } : undefined,
+                  image: data[0].products[0].imageUrl ? { uri: data[0].products[0].imageUrl } : undefined,
                   vendeur: 'Boutique Officielle',
                   ventes: '256 ventes',
+                  titreOriginal: 'Produit Premium Exclusif',
                 }}
                 onPressItem={() => console.log('Produit premium cliqué')}
               />
@@ -685,7 +838,7 @@ export default function HomeComponent() {
                     article={{
                       titre: design4Products[0].titre,
                       disponibilite: design4Products[0].status === 'active' ? 'disponible' : 'indisponible',
-                      prix1: design4Products[0].prix,
+                      prix1: formatPrice(design4Products[0].prix),
                       image: design4Products[0].imageUrl ? { uri: design4Products[0].imageUrl } : undefined,
                       vendeur: design4Products[0].vendeur || 'Boutique Tendance',
                       ventes: `${Math.floor(Math.random() * 200) + 10} ventes`,
@@ -703,7 +856,7 @@ export default function HomeComponent() {
   );
 
   // Mémoiser la fonction d'extraction de clé pour la FlatList
-  const keyExtractor = useCallback((item: Product) => `product_${item.id}`, []);
+  const keyExtractor = useCallback((item: productGroup) => `product_${item.id}`, []);
 
   const renderLoader = () => {
     // Si c'est le chargement initial (pas de données)
@@ -834,9 +987,19 @@ export default function HomeComponent() {
   // Log pour le rendu du composant - uniquement quand les données changent réellement
   useEffect(() => {
     if (data.length > 0) {
-      console.log(`[HOME] Rendu du composant avec ${data.length} produits, page ${page}, hasMore: ${hasMore}`);
+      // console.log(`[HOME] Rendu du composant avec ${data.length} produits, page ${page}, hasMore: ${hasMore}`);
+      // Ajouter un log pour afficher les IDs des produits pour déboguer
+      // console.log(`[HOME] IDs des produits: ${data.map(p => p.id).join(', ')}`);
+
+      // Si on a détecté des doublons dans le reducer mais que hasMore est toujours à true,
+      // forcer hasMore à false pour arrêter les requêtes
+      const uniqueIds = new Set(data.map((p: productGroup) => p.id));
+      if (uniqueIds.size < data.length && hasMore) {
+        // console.log(`[HOME] Détection de doublons dans les données, arrêt des requêtes`);
+        dispatch(setHasMore(false));
+      }
     }
-  }, [data.length, page, hasMore]);
+  }, [data.length, page, hasMore, dispatch]);
 
   // Composant d'en-tête pour le FlatList qui contient la bannière défilante
   const renderListHeader = useCallback(() => {
@@ -876,22 +1039,32 @@ export default function HomeComponent() {
           contentContainerStyle={{ gap: 20, paddingHorizontal: 0, justifyContent: 'center', width: '100%' }}
           removeClippedSubviews={true}>
           {/* Afficher le produit principal */}
-          <ItemDesign1 article={article} onPressItem={createOnPressItem(defaultItem)} key={`${defaultItem.id}_main`} />
+          <ItemDesign1
+            article={article}
+            onPressItem={createOnPressItem(defaultItem.products[0])}
+            key={`${defaultItem.id}_main`}
+          />
 
           {/* Afficher les produits suivants */}
-          {design1Products.map((product, idx) => {
+          {data.slice(1, 3).map((product: productGroup, idx: number) => {
+            if (!product || !product.products || !product.products[0]) return null; // Vérification de sécurité complète
+
+            // Récupérer le premier produit avec vérification de sécurité
+            const firstProduct = product.products[0];
+
             const productArticle = {
-              titre: product.titre,
-              disponibilite: product.status === 'active' ? 'disponible' : 'indisponible',
-              prix1: product.prix,
-              image: product.imageUrl ? { uri: product.imageUrl } : undefined,
-              vendeur: product.vendeur,
-              ventes: product.ventes,
+              titre: firstProduct.titre || `Produit ${idx + 1}`,
+              titreOriginal: firstProduct.titreOriginal || firstProduct.titre || `Produit ${idx + 1}`,
+              disponibilite: firstProduct.status === 'active' ? 'disponible' : 'indisponible',
+              prix1: formatPrice(firstProduct.prix || '0'),
+              image: firstProduct.imageUrl ? { uri: firstProduct.imageUrl } : undefined,
+              vendeur: firstProduct.vendeur || `Boutique ${idx + 1}`,
+              ventes: firstProduct.ventes || `${Math.floor(Math.random() * 100) + 50} ventes`,
             };
             return (
               <ItemDesign1
                 article={productArticle}
-                onPressItem={createOnPressItem(product)}
+                onPressItem={createOnPressItem(product.products[0])}
                 key={`${product.id}_design1_${idx}`}
               />
             );
@@ -899,7 +1072,7 @@ export default function HomeComponent() {
         </ScrollView>
       </View>
     );
-  }, [data.length, article, defaultItem, design1Products, createOnPressItem]);
+  }, [data.length, article, defaultItem, createOnPressItem]);
 
   return (
     <>
@@ -911,7 +1084,7 @@ export default function HomeComponent() {
           renderItem={renderItem}
           keyExtractor={keyExtractor}
           onEndReached={fetchMoreData}
-          onEndReachedThreshold={0.5}
+          onEndReachedThreshold={0}
           ListHeaderComponent={renderListHeader}
           ListFooterComponent={renderFooterLoader}
           contentContainerStyle={{ paddingHorizontal: 0 }}
